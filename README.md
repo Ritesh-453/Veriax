@@ -113,24 +113,7 @@ Open `http://127.0.0.1:5000` in your browser.
 
 ---
 
-## 📱 Screenshots
 
-### Dashboard
-Live analytics with violation trends and most targeted assets.
-
-### Asset Registry
-Register official sports media with automatic fingerprint generation.
-
-### Scan & Detect
-Upload suspect images and get instant similarity scores with AI analysis.
-
-### PDF Report
-Export legal-grade violation reports for rights enforcement.
-
-### SDG Alignment
-Full UN Sustainable Development Goals alignment documentation.
-
----
 
 ## 🌍 UN SDG Alignment
 
