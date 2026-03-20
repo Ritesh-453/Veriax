@@ -55,6 +55,9 @@ Suspect Image → Hash Comparison + Gemini AI → Similarity Score → Alert
 ### SDG Alignment
 ![SDG](static/screenshots/sdg.png)
 
+### Web Scanner
+![Scanner](static/screenshots/scanner.png)
+
 ---
 
 ## ✨ Key Features
