@@ -1,3 +1,4 @@
+from routes.watermark import embed_watermark
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from database.db import get_db
 from database.firebase_db import save_asset_firebase
@@ -37,6 +38,16 @@ def upload_asset():
     file = request.files['image']
     name = request.form.get('name', file.filename)
 
+    # Check if asset with same name already exists
+    db = get_db(current_app.config['DATABASE'])
+    existing = db.execute(
+        'SELECT id FROM assets WHERE name = ?', (name,)
+    ).fetchone()
+    if existing:
+        db.close()
+        flash(f'Asset "{name}" already exists in registry!')
+        return redirect(url_for('assets.list_assets'))
+
     if file.filename == '':
         flash('No file selected')
         return redirect(url_for('index'))
@@ -49,12 +60,24 @@ def upload_asset():
     if not hashes:
         flash('Could not process image')
         return redirect(url_for('index'))
+    
 
     # Save to SQLite
+    # Embed invisible watermark
+    wm_path, wm_text = embed_watermark(
+        filepath,
+        name,
+        current_app.config['UPLOAD_FOLDER']
+    )
+    wm_filename = os.path.basename(wm_path) if wm_path else filename
+
     db = get_db(current_app.config['DATABASE'])
     db.execute(
-        'INSERT INTO assets (name, filename, phash, dhash, ahash) VALUES (?, ?, ?, ?, ?)',
-        (name, filename, hashes['phash'], hashes['dhash'], hashes['ahash'])
+        '''INSERT INTO assets
+        (name, filename, phash, dhash, ahash, watermark_file)
+        VALUES (?, ?, ?, ?, ?, ?)''',
+        (name, filename, hashes['phash'],
+         hashes['dhash'], hashes['ahash'], wm_filename)
     )
     db.commit()
     db.close()

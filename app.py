@@ -24,12 +24,14 @@ app.register_blueprint(report_bp)
 app.register_blueprint(scanner_bp)
 
 # Start background scanner thread
-scanner_thread = threading.Thread(
-    target=run_scheduled_scan,
-    args=(app,),
-    daemon=True
-)
-scanner_thread.start()
+# Background scanner disabled during development
+# Uncomment below for production deployment
+# scanner_thread = threading.Thread(
+#     target=run_scheduled_scan,
+#     args=(app,),
+#     daemon=True
+# )
+# scanner_thread.start()
 
 @app.route('/')
 def index():

@@ -25,6 +25,10 @@ def init_db(db_path):
         cursor.execute('ALTER TABLE assets ADD COLUMN ahash TEXT NOT NULL DEFAULT ""')
     except:
         pass
+    try:
+        cursor.execute('ALTER TABLE assets ADD COLUMN watermark_file TEXT DEFAULT ""')
+    except:
+        pass
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS violations (

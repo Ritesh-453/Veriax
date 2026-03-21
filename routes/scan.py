@@ -1,3 +1,5 @@
+from routes.watermark import check_watermark
+from routes.deeplearning_detector import fast_mobilenet_similarity
 from routes.opencv_detector import combined_opencv_score, get_keypoint_count
 from flask import Blueprint, render_template, request, current_app
 from database.db import get_db
@@ -61,17 +63,30 @@ def get_risk_label(similarity):
     else:
         return 'LOW', '#10b981'
     
-def combined_similarity(hash_score, opencv_score):
+def combined_similarity(hash_score, opencv_score, dl_score):
     """
-    Intelligently combine hash and OpenCV scores
-    Hash is fast, OpenCV is accurate — use both
+    Intelligently combine Hash + OpenCV + Deep Learning scores
+    Each method catches different types of violations
     """
-    if opencv_score > 0:
-        # If OpenCV found matches, weight it heavily
-        final = (hash_score * 0.3) + (opencv_score * 0.7)
+    active_methods = sum([
+        1 if hash_score > 0 else 0,
+        1 if opencv_score > 0 else 0,
+        1 if dl_score > 0 else 0
+    ])
+
+    if active_methods == 3:
+        # All methods working — weighted combination
+        final = (hash_score * 0.2) + (opencv_score * 0.3) + (dl_score * 0.5)
+    elif active_methods == 2:
+        if dl_score > 0 and opencv_score > 0:
+            final = (opencv_score * 0.4) + (dl_score * 0.6)
+        elif dl_score > 0:
+            final = (hash_score * 0.3) + (dl_score * 0.7)
+        else:
+            final = (hash_score * 0.3) + (opencv_score * 0.7)
     else:
-        # Fall back to hash only
         final = hash_score
+
     return round(final, 2)
 
 @scan_bp.route('/scan', methods=['GET', 'POST'])
@@ -99,6 +114,8 @@ def scan():
 
         # Gemini AI analysis of scanned image
         ai_analysis = analyze_image(filepath)
+        # Check for watermark
+        watermark_result = check_watermark(filepath)
 
         if not scan_hashes:
             return render_template('scan.html', results=results,
@@ -125,8 +142,13 @@ def scan():
             if os.path.exists(asset_path):
                 opencv_score = combined_opencv_score(asset_path, filepath)
 
+            # MobileNet deep learning similarity
+            dl_score = 0
+            if os.path.exists(asset_path):
+                dl_score = fast_mobilenet_similarity(asset_path, filepath)
+
             # Combined final score
-            similarity = combined_similarity(hash_score, opencv_score)
+            similarity = combined_similarity(hash_score, opencv_score, dl_score)
             risk_label, risk_color = get_risk_label(similarity)
 
             # For high matches — get AI comparison too
@@ -159,6 +181,7 @@ def scan():
                 'similarity': similarity,
                 'hash_score': hash_score,
                 'opencv_score': opencv_score,
+                'dl_score': dl_score,
                 'status': 'ALERT' if similarity > 70 else 'SAFE',
                 'risk_label': risk_label,
                 'risk_color': risk_color,
@@ -181,7 +204,8 @@ def scan():
     return render_template('scan.html', results=results,
                            exif_data=exif_data,
                            scan_filename=scan_filename,
-                           ai_analysis=ai_analysis)
+                           ai_analysis=ai_analysis,
+                           watermark_result=watermark_result if request.method == 'POST' else None)
 
 @scan_bp.route('/violations')
 def violations():

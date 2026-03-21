@@ -33,6 +33,39 @@
 </div>
 {% endif %}
 
+{% if watermark_result %}
+<div class="card" style="border-left: 4px solid
+    {{ '#10b981' if watermark_result.has_watermark else '#e11d48' }};">
+    <div class="card-title">
+        <i class="fas fa-shield-halved" style="color:
+            {{ '#10b981' if watermark_result.has_watermark else '#e11d48' }}">
+        </i> Digital Watermark Detection
+    </div>
+    <div style="display:flex; align-items:center; gap:16px; padding:16px;
+                background: {{ '#f0fdf4' if watermark_result.has_watermark else '#fff1f2' }};
+                border-radius:8px;">
+        <div style="font-size:2rem;">
+            {{ '🛡️' if watermark_result.has_watermark else '⚠️' }}
+        </div>
+        <div>
+            <div style="font-weight:700; color:
+                {{ '#166534' if watermark_result.has_watermark else '#e11d48' }};">
+                {{ watermark_result.status }}
+            </div>
+            <div style="font-size:0.85rem; color:#475569; margin-top:4px;">
+                {{ watermark_result.message }}
+            </div>
+            {% if watermark_result.has_watermark %}
+            <div style="font-size:0.8rem; color:#10b981; margin-top:4px;">
+                <i class="fas fa-clock"></i>
+                Registered: {{ watermark_result.timestamp }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
 {% if exif_data %}
 <div class="card">
     <div class="card-title">
@@ -71,8 +104,9 @@
                     Final Score: <strong>{{ r.similarity }}%</strong>
                     </div>
                     <div style="font-size:0.78rem; color:#94a3b8; margin-top:2px;">
-                        Hash: {{ r.hash_score }}% |
-                        OpenCV SIFT+ORB: {{ r.opencv_score }}%
+                    Hash: {{ r.hash_score }}% |
+                    OpenCV: {{ r.opencv_score }}% |
+                    AI: {{ r.dl_score }}%
                     </div>
                     {% if r.status == 'ALERT' %}
                     <div style="font-size:0.78rem; color:#e11d48; margin-top:4px;">
