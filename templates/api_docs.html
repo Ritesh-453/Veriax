@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card" style="border-top: 4px solid #4f46e5; margin-bottom:24px;">
+    <div class="card-title">
+        <i class="fas fa-code" style="color:#4f46e5"></i> REST API Documentation
+        <span class="badge badge-info" style="margin-left:8px;">v1.0</span>
+    </div>
+    <p style="color:#475569;">
+        Integrate SportShield AI into your own applications using our REST API.
+        Base URL: <code style="background:#f1f5f9; padding:4px 8px; border-radius:4px;">
+        http://127.0.0.1:5000</code>
+    </p>
+</div>
+
+{% set endpoints = [
+    {
+        'method': 'GET',
+        'color': '#10b981',
+        'path': '/api/v1/status',
+        'title': 'System Status',
+        'desc': 'Check API health and get system statistics',
+        'response': '{"status": "operational", "total_assets": 2, "total_violations": 7}'
+    },
+    {
+        'method': 'GET',
+        'color': '#10b981',
+        'path': '/api/v1/assets',
+        'title': 'List Assets',
+        'desc': 'Get all registered protected assets',
+        'response': '{"success": true, "count": 2, "assets": [...]}'
+    },
+    {
+        'method': 'POST',
+        'color': '#4f46e5',
+        'path': '/api/v1/scan',
+        'title': 'Scan Image',
+        'desc': 'Upload an image to check for violations against all registered assets',
+        'response': '{"violations_found": 1, "results": [{"asset_name": "Olympic Rings", "scores": {...}}]}'
+    },
+    {
+        'method': 'POST',
+        'color': '#4f46e5',
+        'path': '/api/v1/register',
+        'title': 'Register Asset',
+        'desc': 'Register a new protected asset via API with auto watermarking',
+        'response': '{"success": true, "asset_id": 3, "fingerprint": "c43f0738..."}'
+    },
+    {
+        'method': 'GET',
+        'color': '#10b981',
+        'path': '/api/v1/violations',
+        'title': 'Get Violations',
+        'desc': 'Retrieve all detected violations with timestamps',
+        'response': '{"count": 7, "violations": [{"asset_name": "Olympic Rings", "similarity": 86.88}]}'
+    }
+] %}
+
+{% for ep in endpoints %}
+<div class="card" style="margin-bottom:16px;">
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+        <span style="background:{{ ep.color }}; color:white; padding:4px 10px;
+                     border-radius:6px; font-weight:700; font-size:0.8rem;
+                     min-width:52px; text-align:center;">{{ ep.method }}</span>
+        <code style="background:#f1f5f9; padding:6px 12px; border-radius:6px;
+                     font-size:0.9rem; color:#4f46e5; font-weight:600;">{{ ep.path }}</code>
+        <span style="font-weight:700;">{{ ep.title }}</span>
+    </div>
+    <p style="color:#475569; font-size:0.9rem; margin-bottom:12px;">{{ ep.desc }}</p>
+    <div style="background:#0f172a; padding:12px 16px; border-radius:8px;">
+        <code style="color:#10b981; font-size:0.82rem;">{{ ep.response }}</code>
+    </div>
+</div>
+{% endfor %}
+
+<div class="card" style="background:#f8fafc;">
+    <div class="card-title">
+        <i class="fas fa-terminal" style="color:#4f46e5"></i> Quick Test
+    </div>
+    <p style="color:#475569; font-size:0.9rem; margin-bottom:16px;">
+        Test the API directly from your terminal:
+    </p>
+    <div style="background:#0f172a; padding:16px; border-radius:8px; margin-bottom:12px;">
+        <code style="color:#10b981; font-size:0.82rem; display:block; margin-bottom:8px;">
+            # Check status
+        </code>
+        <code style="color:#e2e8f0; font-size:0.82rem;">
+            curl http://127.0.0.1:5000/api/v1/status
+        </code>
+    </div>
+    <div style="background:#0f172a; padding:16px; border-radius:8px; margin-bottom:12px;">
+        <code style="color:#10b981; font-size:0.82rem; display:block; margin-bottom:8px;">
+            # Scan an image
+        </code>
+        <code style="color:#e2e8f0; font-size:0.82rem;">
+            curl -X POST -F "image=@logo.png" http://127.0.0.1:5000/api/v1/scan
+        </code>
+    </div>
+    <div style="background:#0f172a; padding:16px; border-radius:8px;">
+        <code style="color:#10b981; font-size:0.82rem; display:block; margin-bottom:8px;">
+            # Get all violations
+        </code>
+        <code style="color:#e2e8f0; font-size:0.82rem;">
+            curl http://127.0.0.1:5000/api/v1/violations?limit=10
+        </code>
+    </div>
+</div>
+
+{% endblock %}

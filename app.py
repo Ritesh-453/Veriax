@@ -19,11 +19,13 @@ from routes.assets import assets_bp
 from routes.scan import scan_bp
 from routes.report import report_bp
 from routes.scanner import scanner_bp, run_scheduled_scan
+from routes.api import api_bp
 
 app.register_blueprint(assets_bp)
 app.register_blueprint(scan_bp)
 app.register_blueprint(report_bp)
 app.register_blueprint(scanner_bp)
+app.register_blueprint(api_bp)
 
 # Start background scanner thread
 # Background scanner disabled during development
@@ -55,6 +57,9 @@ def video_frame(filename):
         os.path.join(app.config['UPLOAD_FOLDER'], 'video_frames'),
         filename
     )
+@app.route('/api-docs')
+def api_docs():
+    return render_template('api_docs.html')
 
 @app.route('/video', methods=['GET', 'POST'])
 def video_scan():
