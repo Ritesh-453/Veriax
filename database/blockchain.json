@@ -1,0 +1,81 @@
+[
+  {
+    "index": 0,
+    "timestamp": "2026-01-01T00:00:00",
+    "type": "GENESIS",
+    "data": {
+      "message": "SportShield AI Blockchain \u2014 Tamper-Proof Violation Log"
+    },
+    "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "hash": "7e87a89704f3d877ea0efcbafc44b7b734bddb668092c2890b0fbfbf781e521d"
+  },
+  {
+    "index": 1,
+    "timestamp": "2026-03-21T17:03:28.279474",
+    "type": "VIOLATION",
+    "data": {
+      "asset_name": "Olympic Rings ",
+      "similarity": 99.08,
+      "risk_level": "CRITICAL",
+      "detection_methods": [
+        "pHash",
+        "dHash",
+        "aHash",
+        "SIFT",
+        "ORB",
+        "MobileNet"
+      ],
+      "found_url": null,
+      "scan_type": "IMAGE",
+      "evidence_hash": "499e51c3765adcf5"
+    },
+    "previous_hash": "7e87a89704f3d877ea0efcbafc44b7b734bddb668092c2890b0fbfbf781e521d",
+    "hash": "e44a57f1ddc433aecfea55a93a163ca13889bec2d9ce3fc8e18f7a7f100121e3"
+  },
+  {
+    "index": 2,
+    "timestamp": "2026-03-21T17:07:19.804164",
+    "type": "VIOLATION",
+    "data": {
+      "asset_name": "Olympic Rings ",
+      "similarity": 99.08,
+      "risk_level": "CRITICAL",
+      "detection_methods": [
+        "pHash",
+        "dHash",
+        "aHash",
+        "SIFT",
+        "ORB",
+        "MobileNet"
+      ],
+      "found_url": null,
+      "scan_type": "IMAGE",
+      "evidence_hash": "499e51c3765adcf5"
+    },
+    "previous_hash": "e44a57f1ddc433aecfea55a93a163ca13889bec2d9ce3fc8e18f7a7f100121e3",
+    "hash": "cc6c24678f9dfcc9ae24d2013102acfdb43d4e5215022d1c792b80be73838a78"
+  },
+  {
+    "index": 3,
+    "timestamp": "2026-03-21T17:07:44.145429",
+    "type": "VIOLATION",
+    "data": {
+      "asset_name": "Olympic Rings ",
+      "similarity": 99.08,
+      "risk_level": "CRITICAL",
+      "detection_methods": [
+        "pHash",
+        "dHash",
+        "aHash",
+        "SIFT",
+        "ORB",
+        "MobileNet"
+      ],
+      "found_url": null,
+      "scan_type": "IMAGE",
+      "evidence_hash": "499e51c3765adcf5"
+    },
+    "previous_hash": "cc6c24678f9dfcc9ae24d2013102acfdb43d4e5215022d1c792b80be73838a78",
+    "hash": "c321b2f12ca791a45d547e2531a425eaab71a49986450bfa678891843e95ef7e"
+  }
+]
