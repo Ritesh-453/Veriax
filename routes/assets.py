@@ -1,3 +1,4 @@
+from routes.blockchain import add_asset_block
 from routes.watermark import embed_watermark
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from database.db import get_db
@@ -84,6 +85,9 @@ def upload_asset():
 
     # Save to Firebase (dual write)
     save_asset_firebase(name, filename, hashes['phash'], hashes['dhash'], hashes['ahash'])
+
+    # Add to blockchain
+    add_asset_block(name, filename, hashes['phash'])
 
     flash(f'Asset "{name}" registered successfully!')
     return redirect(url_for('assets.list_assets'))

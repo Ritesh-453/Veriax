@@ -1,6 +1,7 @@
 from routes.video_scanner import scan_video
 from flask import Flask, render_template, send_from_directory, request
 from dotenv import load_dotenv
+from routes.blockchain import get_chain_stats, load_chain, verify_chain
 import os
 import uuid
 import threading
@@ -130,6 +131,20 @@ def video_scan():
     return render_template('video_scan.html',
                            violations=violations,
                            video_info=video_info)
+
+@app.route('/blockchain')
+def blockchain():
+    stats = get_chain_stats()
+    chain = load_chain()
+    return render_template('blockchain.html', stats=stats, chain=chain)
+
+@app.route('/blockchain/verify')
+def blockchain_verify():
+    from routes.blockchain import verify_chain
+    valid, message = verify_chain()
+    from flask import flash
+    flash(f"{'✓' if valid else '✗'} {message}")
+    return redirect(url_for('blockchain'))
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False)

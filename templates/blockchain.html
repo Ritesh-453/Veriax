@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card" style="border-top: 4px solid #4f46e5; margin-bottom:24px;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+            <div class="card-title">
+                <i class="fas fa-link" style="color:#4f46e5"></i> Blockchain Ledger
+                <span class="badge badge-info" style="margin-left:8px;">Tamper-Proof</span>
+            </div>
+            <p style="color:#475569; font-size:0.9rem; margin-top:-12px;">
+                Every violation is cryptographically logged — impossible to alter or delete
+            </p>
+        </div>
+        <a href="/blockchain/verify" class="btn btn-primary" style="font-size:0.85rem;">
+            <i class="fas fa-shield-check"></i> Verify Chain
+        </a>
+    </div>
+</div>
+
+<!-- Stats -->
+<div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:16px; margin-bottom:24px;">
+    <div class="card" style="text-align:center; padding:20px;">
+        <div style="font-size:2rem; font-weight:800; color:#4f46e5;">{{ stats.total_blocks }}</div>
+        <div style="color:#475569; font-size:0.85rem;">Total Blocks</div>
+    </div>
+    <div class="card" style="text-align:center; padding:20px;">
+        <div style="font-size:2rem; font-weight:800; color:#e11d48;">{{ stats.violation_blocks }}</div>
+        <div style="color:#475569; font-size:0.85rem;">Violations</div>
+    </div>
+    <div class="card" style="text-align:center; padding:20px;">
+        <div style="font-size:2rem; font-weight:800; color:#10b981;">{{ stats.asset_blocks }}</div>
+        <div style="color:#475569; font-size:0.85rem;">Assets Registered</div>
+    </div>
+    <div class="card" style="text-align:center; padding:20px; border-top:4px solid {{ '#10b981' if stats.chain_valid else '#e11d48' }};">
+        <div style="font-size:1.2rem; font-weight:800; color:{{ '#10b981' if stats.chain_valid else '#e11d48' }};">
+            {{ '✓ VALID' if stats.chain_valid else '✗ INVALID' }}
+        </div>
+        <div style="color:#475569; font-size:0.85rem;">Chain Status</div>
+    </div>
+</div>
+
+<!-- Blockchain visualization -->
+<div class="card">
+    <div class="card-title">
+        <i class="fas fa-cubes" style="color:#4f46e5"></i> Block Explorer
+    </div>
+
+    {% if chain %}
+        {% for block in chain|reverse %}
+        <div style="margin-bottom:16px; position:relative;">
+            {% if not loop.last %}
+            <div style="position:absolute; left:23px; top:52px; width:2px; height:calc(100% - 20px);
+                        background: linear-gradient(#4f46e5, #e2e8f0); z-index:0;"></div>
+            {% endif %}
+
+            <div style="display:flex; gap:16px; align-items:flex-start; position:relative; z-index:1;">
+                <!-- Block icon -->
+                <div style="width:48px; height:48px; border-radius:50%; display:flex; align-items:center;
+                            justify-content:center; flex-shrink:0; font-size:1.1rem;
+                            background: {{ '#fff1f2' if block.type == 'VIOLATION' else '#f0fdf4' if block.type == 'ASSET_REGISTERED' else '#eef2ff' }};
+                            border: 2px solid {{ '#e11d48' if block.type == 'VIOLATION' else '#10b981' if block.type == 'ASSET_REGISTERED' else '#4f46e5' }};">
+                    {{ '⚠️' if block.type == 'VIOLATION' else '🛡️' if block.type == 'ASSET_REGISTERED' else '🔗' }}
+                </div>
+
+                <!-- Block content -->
+                <div style="flex:1; background:#f8fafc; border-radius:10px; padding:16px;
+                            border:1px solid #e2e8f0;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-weight:700; font-size:0.9rem;">Block #{{ block.index }}</span>
+                            <span class="badge {{ 'badge-alert' if block.type == 'VIOLATION' else 'badge-safe' if block.type == 'ASSET_REGISTERED' else 'badge-info' }}"
+                                  style="font-size:0.75rem;">
+                                {{ block.type }}
+                            </span>
+                        </div>
+                        <span style="font-size:0.78rem; color:#94a3b8;">{{ block.timestamp[:16] }}</span>
+                    </div>
+
+                    {% if block.type == 'VIOLATION' %}
+                    <div style="font-size:0.85rem; color:#475569;">
+                        <strong style="color:#e11d48;">{{ block.data.asset_name }}</strong> —
+                        {{ block.data.similarity }}% similarity —
+                        <span style="color:{{ '#e11d48' if block.data.risk_level == 'CRITICAL' else '#f97316' if block.data.risk_level == 'HIGH' else '#f59e0b' }};">
+                            {{ block.data.risk_level }} RISK
+                        </span>
+                    </div>
+                    <div style="font-size:0.78rem; color:#94a3b8; margin-top:4px;">
+                        Evidence: {{ block.data.evidence_hash }}
+                    </div>
+                    {% elif block.type == 'ASSET_REGISTERED' %}
+                    <div style="font-size:0.85rem; color:#475569;">
+                        Asset registered: <strong style="color:#10b981;">{{ block.data.asset_name }}</strong>
+                    </div>
+                    <div style="font-size:0.78rem; color:#94a3b8; margin-top:4px;">
+                        Fingerprint: {{ block.data.fingerprint }}
+                    </div>
+                    {% else %}
+                    <div style="font-size:0.85rem; color:#475569;">{{ block.data.message }}</div>
+                    {% endif %}
+
+                    <!-- Hash display -->
+                    <div style="margin-top:8px; padding:6px 10px; background:#0f172a;
+                                border-radius:6px; font-family:monospace; font-size:0.75rem; color:#10b981;">
+                        <span style="color:#475569;">hash: </span>{{ block.hash[:32] }}...
+                        <span style="color:#475569; margin-left:8px;">prev: </span>{{ block.previous_hash[:16] }}...
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+    <div style="text-align:center; padding:40px; color:#94a3b8;">
+        <i class="fas fa-link" style="font-size:2rem; margin-bottom:12px; display:block;"></i>
+        No blocks yet. Register an asset or scan an image to create the first block.
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

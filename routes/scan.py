@@ -4,6 +4,7 @@ from routes.opencv_detector import combined_opencv_score, get_keypoint_count
 from flask import Blueprint, render_template, request, current_app
 from database.db import get_db
 from PIL import Image
+from routes.blockchain import add_violation_block
 import imagehash
 import exifread
 import os
@@ -169,6 +170,14 @@ def scan():
                     asset['name'],
                     similarity,
                     asset['filename']
+                )
+
+                # Add to blockchain
+                add_violation_block(
+                    asset['name'],
+                    similarity,
+                    ['pHash', 'dHash', 'aHash', 'SIFT', 'ORB', 'MobileNet'],
+                    scan_type='IMAGE'   
                 )
 
                 # Send email alert
