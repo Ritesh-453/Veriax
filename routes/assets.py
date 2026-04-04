@@ -7,7 +7,7 @@ from PIL import Image
 import imagehash
 import os
 import uuid
-from datetime import date
+from datetime import date, datetime, timedelta
 
 assets_bp = Blueprint('assets', __name__)
 
@@ -24,10 +24,7 @@ def get_all_hashes(path):
 
 
 def get_license_status(asset):
-    """
-    Returns: 'ACTIVE', 'EXPIRED', 'EXPIRING_SOON', or 'NO_LICENSE'
-    """
-    if not asset['license_end']:
+    if not asset.get('license_end'):
         return 'NO_LICENSE'
     try:
         end = date.fromisoformat(asset['license_end'])
@@ -43,21 +40,68 @@ def get_license_status(asset):
         return 'NO_LICENSE'
 
 
+def get_risk_trend(asset_id, db):
+    """
+    Returns trend info for an asset:
+    - violations_this_week: count
+    - violations_last_week: count
+    - trend: 'UP', 'DOWN', 'STABLE', 'CLEAN'
+    - trend_label: human readable
+    """
+    try:
+        this_week = db.execute('''
+            SELECT COUNT(*) FROM violations
+            WHERE asset_id = ?
+            AND detected_at >= DATE('now', '-7 days')
+        ''', (asset_id,)).fetchone()[0]
+
+        last_week = db.execute('''
+            SELECT COUNT(*) FROM violations
+            WHERE asset_id = ?
+            AND detected_at >= DATE('now', '-14 days')
+            AND detected_at < DATE('now', '-7 days')
+        ''', (asset_id,)).fetchone()[0]
+
+        total = db.execute(
+            'SELECT COUNT(*) FROM violations WHERE asset_id = ?',
+            (asset_id,)
+        ).fetchone()[0]
+
+        if this_week == 0 and total == 0:
+            return {'trend': 'CLEAN', 'label': '✓ Clean — no violations',
+                    'color': '#10b981', 'this_week': 0, 'total': 0}
+        elif this_week == 0:
+            return {'trend': 'CLEAN', 'label': f'✓ Clean for 7 days ({total} total)',
+                    'color': '#10b981', 'this_week': 0, 'total': total}
+        elif this_week > last_week:
+            return {'trend': 'UP', 'label': f'↑ {this_week} violations this week',
+                    'color': '#e11d48', 'this_week': this_week, 'total': total}
+        elif this_week < last_week:
+            return {'trend': 'DOWN', 'label': f'↓ Decreasing ({this_week} this week)',
+                    'color': '#f97316', 'this_week': this_week, 'total': total}
+        else:
+            return {'trend': 'STABLE', 'label': f'→ {this_week} violations this week',
+                    'color': '#f59e0b', 'this_week': this_week, 'total': total}
+    except:
+        return {'trend': 'CLEAN', 'label': 'No data', 'color': '#94a3b8',
+                'this_week': 0, 'total': 0}
+
+
 @assets_bp.route('/assets')
 def list_assets():
     db = get_db(current_app.config['DATABASE'])
     assets_raw = db.execute(
         'SELECT * FROM assets ORDER BY uploaded_at DESC'
     ).fetchall()
-    db.close()
 
-    # Attach license status to each asset
     assets = []
     for a in assets_raw:
         a_dict = dict(a)
-        a_dict['license_status'] = get_license_status(a)
+        a_dict['license_status'] = get_license_status(a_dict)
+        a_dict['risk_trend'] = get_risk_trend(a_dict['id'], db)
         assets.append(a_dict)
 
+    db.close()
     return render_template('assets.html', assets=assets)
 
 

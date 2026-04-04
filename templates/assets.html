@@ -2,12 +2,15 @@
 {% block content %}
 
 <div class="card">
-    <div class="card-title">
-        <i class="fas fa-database" style="color:#4f46e5"></i> Asset Registry
+    <div class="card-title" style="justify-content:space-between;">
+        <span><i class="fas fa-database" style="color:#4f46e5"></i> Asset Registry</span>
+        <span style="font-size:0.82rem; color:#94a3b8; font-weight:400;">
+            {{ assets|length }} assets protected
+        </span>
     </div>
 
     {% if assets %}
-    <!-- License status summary -->
+    <!-- License warnings -->
     {% set expired = assets | selectattr('license_status', 'equalto', 'EXPIRED') | list %}
     {% set expiring = assets | selectattr('license_status', 'equalto', 'EXPIRING_SOON') | list %}
     {% if expired or expiring %}
@@ -21,7 +24,7 @@
         {% if expiring %}
         <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px;
                     padding:10px 16px; font-size:0.85rem; color:#b45309; font-weight:600;">
-            <i class="fas fa-triangle-exclamation"></i> {{ expiring|length }} asset(s) expiring within 30 days
+            <i class="fas fa-triangle-exclamation"></i> {{ expiring|length }} expiring within 30 days
         </div>
         {% endif %}
     </div>
@@ -30,73 +33,99 @@
     <table style="width:100%; border-collapse:collapse;">
         <thead>
             <tr style="background:#f8fafc;">
-                <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:#475569;
+                <th style="padding:12px 16px; text-align:left; font-size:0.78rem; color:#475569;
                             text-transform:uppercase; border-bottom:1px solid #e2e8f0;">Asset</th>
-                <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:#475569;
+                <th style="padding:12px 16px; text-align:left; font-size:0.78rem; color:#475569;
                             text-transform:uppercase; border-bottom:1px solid #e2e8f0;">Preview</th>
-                <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:#475569;
+                <th style="padding:12px 16px; text-align:left; font-size:0.78rem; color:#475569;
+                            text-transform:uppercase; border-bottom:1px solid #e2e8f0;">
+                    Risk Trend
+                    <span style="font-size:0.65rem; color:#94a3b8; font-weight:400;"> (7 days)</span>
+                </th>
+                <th style="padding:12px 16px; text-align:left; font-size:0.78rem; color:#475569;
                             text-transform:uppercase; border-bottom:1px solid #e2e8f0;">License</th>
-                <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:#475569;
+                <th style="padding:12px 16px; text-align:left; font-size:0.78rem; color:#475569;
                             text-transform:uppercase; border-bottom:1px solid #e2e8f0;">Registered</th>
-                <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:#475569;
+                <th style="padding:12px 16px; text-align:left; font-size:0.78rem; color:#475569;
                             text-transform:uppercase; border-bottom:1px solid #e2e8f0;">Action</th>
             </tr>
         </thead>
         <tbody>
             {% for asset in assets %}
-            <tr style="border-bottom:1px solid #f1f5f9;">
+            <tr style="border-bottom:1px solid #f1f5f9;
+                       background:{{ '#fff9f9' if asset.risk_trend.trend == 'UP' else 'white' }}">
                 <td style="padding:14px 16px;">
                     <div style="font-weight:600; color:#0f172a;">{{ asset.name }}</div>
-                    <div style="font-size:0.75rem; color:#94a3b8; margin-top:2px;">
-                        {{ asset.filename[:30] }}{% if asset.filename|length > 30 %}...{% endif %}
+                    <div style="font-size:0.72rem; color:#94a3b8; margin-top:2px;">
+                        {{ asset.filename[:28] }}{% if asset.filename|length > 28 %}...{% endif %}
                     </div>
                 </td>
                 <td style="padding:14px 16px;">
                     <img src="/uploads/{{ asset.filename }}"
-                         style="width:48px; height:48px; object-fit:cover;
+                         style="width:48px; height:48px; object-fit:contain;
                                 border-radius:8px; border:1px solid #e2e8f0;">
+                </td>
+                <td style="padding:14px 16px;">
+                    <!-- Risk trend arrow -->
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div style="width:32px; height:32px; border-radius:50%; flex-shrink:0;
+                                    background:{{ asset.risk_trend.color }}22;
+                                    display:flex; align-items:center; justify-content:center;
+                                    font-size:1rem;">
+                            {% if asset.risk_trend.trend == 'UP' %}🔴
+                            {% elif asset.risk_trend.trend == 'DOWN' %}🟠
+                            {% elif asset.risk_trend.trend == 'STABLE' %}🟡
+                            {% else %}🟢{% endif %}
+                        </div>
+                        <div>
+                            <div style="font-size:0.82rem; font-weight:700;
+                                        color:{{ asset.risk_trend.color }};">
+                                {{ asset.risk_trend.label }}
+                            </div>
+                            {% if asset.risk_trend.total > 0 %}
+                            <div style="font-size:0.72rem; color:#94a3b8;">
+                                {{ asset.risk_trend.total }} total violations
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
                 </td>
                 <td style="padding:14px 16px;">
                     {% if asset.license_status == 'EXPIRED' %}
                     <span style="background:#fff1f2; color:#e11d48; padding:4px 10px;
-                                 border-radius:999px; font-size:0.75rem; font-weight:700;">
-                        <i class="fas fa-circle-xmark"></i> EXPIRED
+                                 border-radius:999px; font-size:0.72rem; font-weight:700;">
+                        ✕ EXPIRED
                     </span>
                     {% elif asset.license_status == 'EXPIRING_SOON' %}
                     <span style="background:#fffbeb; color:#b45309; padding:4px 10px;
-                                 border-radius:999px; font-size:0.75rem; font-weight:700;">
-                        <i class="fas fa-triangle-exclamation"></i> EXPIRING SOON
+                                 border-radius:999px; font-size:0.72rem; font-weight:700;">
+                        ⚠ EXPIRING
                     </span>
                     {% elif asset.license_status == 'ACTIVE' %}
                     <span style="background:#f0fdf4; color:#10b981; padding:4px 10px;
-                                 border-radius:999px; font-size:0.75rem; font-weight:700;">
-                        <i class="fas fa-circle-check"></i> ACTIVE
+                                 border-radius:999px; font-size:0.72rem; font-weight:700;">
+                        ✓ ACTIVE
                     </span>
                     {% else %}
                     <span style="background:#f1f5f9; color:#94a3b8; padding:4px 10px;
-                                 border-radius:999px; font-size:0.75rem; font-weight:600;">
+                                 border-radius:999px; font-size:0.72rem; font-weight:600;">
                         No License
                     </span>
                     {% endif %}
                     {% if asset.license_end %}
-                    <div style="font-size:0.72rem; color:#94a3b8; margin-top:4px;">
+                    <div style="font-size:0.68rem; color:#94a3b8; margin-top:3px;">
                         Until {{ asset.license_end }}
                     </div>
                     {% endif %}
-                    {% if asset.license_owner %}
-                    <div style="font-size:0.72rem; color:#94a3b8;">
-                        Owner: {{ asset.license_owner }}
-                    </div>
-                    {% endif %}
                 </td>
-                <td style="padding:14px 16px; color:#475569; font-size:0.85rem;">
+                <td style="padding:14px 16px; color:#475569; font-size:0.82rem;">
                     {{ asset.uploaded_at[:10] if asset.uploaded_at else 'N/A' }}
                 </td>
                 <td style="padding:14px 16px;">
                     <form method="POST" action="/assets/delete/{{ asset.id }}"
-                          onsubmit="return confirm('Delete this asset?')">
+                          onsubmit="return confirm('Delete this asset?')" style="display:inline;">
                         <button type="submit" class="btn btn-danger"
-                                style="padding:6px 14px; font-size:0.8rem;">
+                                style="padding:6px 12px; font-size:0.78rem;">
                             <i class="fas fa-trash"></i>
                         </button>
                     </form>
@@ -108,12 +137,12 @@
     {% else %}
     <div style="text-align:center; padding:40px; color:#94a3b8;">
         <i class="fas fa-database" style="font-size:2rem; margin-bottom:12px; display:block;"></i>
-        No assets registered yet. Upload one from the Home page.
+        No assets registered yet. Upload one below.
     </div>
     {% endif %}
 </div>
 
-<!-- Register New Asset with License Fields -->
+<!-- Register New Asset -->
 <div class="card">
     <div class="card-title">
         <i class="fas fa-plus-circle" style="color:#4f46e5"></i> Register New Asset
@@ -163,5 +192,93 @@
         </button>
     </form>
 </div>
+
+<!-- Email DMCA Modal -->
+<div id="email-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);
+     z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:white; border-radius:14px; padding:28px; width:90%; max-width:460px;
+                box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+        <div style="font-weight:700; font-size:1.1rem; margin-bottom:6px;">
+            <i class="fas fa-paper-plane" style="color:#4f46e5"></i> Send DMCA Notice via Email
+        </div>
+        <div style="font-size:0.85rem; color:#64748b; margin-bottom:16px;">
+            Enter the email address of the infringing website's abuse/contact team.
+        </div>
+        <input type="email" id="dmca-email-input" placeholder="e.g. abuse@website.com"
+            style="width:100%; padding:12px 14px; border:1px solid #e2e8f0; border-radius:8px;
+                   font-size:0.9rem; outline:none; margin-bottom:14px; box-sizing:border-box;">
+        <div style="display:flex; gap:10px;">
+            <button onclick="sendDmcaEmail()"
+                    style="flex:1; background:#4f46e5; color:white; padding:11px; border:none;
+                           border-radius:8px; font-weight:700; font-size:0.9rem; cursor:pointer;">
+                <i class="fas fa-paper-plane"></i> Send Now
+            </button>
+            <button onclick="closeEmailModal()"
+                    style="padding:11px 18px; background:#f1f5f9; color:#475569; border:none;
+                           border-radius:8px; font-weight:600; cursor:pointer;">
+                Cancel
+            </button>
+        </div>
+        <div id="email-status" style="margin-top:12px; font-size:0.85rem; display:none;"></div>
+    </div>
+</div>
+
+<script>
+let currentViolationId = null;
+
+function openEmailModal(violationId) {
+    currentViolationId = violationId;
+    document.getElementById('email-modal').style.display = 'flex';
+    document.getElementById('dmca-email-input').focus();
+    document.getElementById('email-status').style.display = 'none';
+}
+
+function closeEmailModal() {
+    document.getElementById('email-modal').style.display = 'none';
+    currentViolationId = null;
+}
+
+async function sendDmcaEmail() {
+    const email = document.getElementById('dmca-email-input').value.trim();
+    const status = document.getElementById('email-status');
+
+    if (!email || !email.includes('@')) {
+        status.style.display = 'block';
+        status.style.color = '#e11d48';
+        status.textContent = 'Please enter a valid email address.';
+        return;
+    }
+
+    status.style.display = 'block';
+    status.style.color = '#4f46e5';
+    status.textContent = 'Sending...';
+
+    try {
+        const res = await fetch(`/report/dmca/${currentViolationId}/email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ recipient_email: email })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            status.style.color = '#10b981';
+            status.textContent = '✓ ' + data.message;
+            setTimeout(closeEmailModal, 2000);
+        } else {
+            status.style.color = '#e11d48';
+            status.textContent = '✕ ' + data.error;
+        }
+    } catch (e) {
+        status.style.color = '#e11d48';
+        status.textContent = 'Network error — please try again.';
+    }
+}
+
+// Close modal on backdrop click
+document.getElementById('email-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeEmailModal();
+});
+</script>
 
 {% endblock %}
