@@ -1,95 +1,99 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<!-- Upload Form -->
 <div class="card">
     <div class="card-title">
         <i class="fas fa-magnifying-glass" style="color:#6366f1;"></i> Image Scan
-        <span style="margin-left:auto; font-size:0.75rem; color:var(--text-muted); font-weight:400;">
-            3-layer AI detection: Hash · OpenCV · MobileNet
+        <span style="margin-left:auto; font-size:0.7rem; color:var(--text-muted); font-weight:400;">
+            3-layer AI: Hash · OpenCV · MobileNet
         </span>
     </div>
     <form method="POST" enctype="multipart/form-data">
-        <div style="display:grid; grid-template-columns:1fr auto; gap:14px; align-items:flex-end;">
-            <div>
-                <label class="form-label">Upload Suspect Image</label>
-                <input type="file" name="image" accept="image/*" required class="form-file">
+        <div style="margin-bottom:14px;">
+            <label class="form-label">Upload Suspect Image</label>
+            <input type="file" name="image" id="scan-img" accept="image/*" required class="file-upload-real">
+            <div class="file-upload-zone" id="scan-zone">
+                <div class="upload-icon"><i class="fas fa-cloud-arrow-up"></i></div>
+                <div class="upload-text">
+                    <div class="upload-title" id="scan-title">Click or drag image here</div>
+                    <div class="upload-sub" id="scan-sub">PNG, JPG, WebP — any image format</div>
+                </div>
+                <div class="upload-btn">Browse</div>
             </div>
-            <button type="submit" class="btn btn-primary" style="height:44px; padding:0 24px;">
-                <i class="fas fa-bolt"></i> Scan Now
-            </button>
         </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; height:42px;">
+            <i class="fas fa-bolt"></i> Run Scan
+        </button>
     </form>
 
     {% if not results and request.method != 'POST' %}
-    <div style="margin-top:16px; background:#fafbff; border:1px solid #e8ecf8; border-radius:8px;
-                padding:12px 16px; font-size:0.82rem; color:#6366f1; display:flex; gap:8px; align-items:center;">
+    <div style="margin-top:14px; background:#f5f7ff; border:1px solid #e0e4ff; border-radius:8px;
+                padding:11px 14px; font-size:0.8rem; color:#6366f1; display:flex; gap:8px; align-items:center;">
         <i class="fas fa-circle-info"></i>
-        Upload any image to check it against all registered assets.
-        Results show confidence breakdown per detection method.
+        Upload any suspect image to check it against all registered assets. Results show full AI breakdown.
     </div>
     {% endif %}
 </div>
 
-<!-- Preview + AI Analysis -->
+<!-- Preview + AI -->
 {% if scan_filename %}
-<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
-    <div class="card" style="padding:20px;">
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px;">
+    <div class="card">
         <div class="card-title"><i class="fas fa-image" style="color:#6366f1;"></i> Scanned Image</div>
         <img src="/uploads/{{ scan_filename }}"
              style="width:100%; border-radius:8px; border:1px solid var(--card-border);
                     max-height:200px; object-fit:contain; background:#fafbfe;">
     </div>
     {% if ai_analysis %}
-    <div class="card" style="padding:20px;">
+    <div class="card">
         <div class="card-title"><i class="fas fa-robot" style="color:#8b5cf6;"></i> Gemini AI Analysis</div>
-        <div style="font-size:0.83rem; color:var(--text-secondary); line-height:1.7;
-                    white-space:pre-line;">{{ ai_analysis }}</div>
+        <div style="font-size:0.82rem; color:var(--text-secondary); line-height:1.7; white-space:pre-line;">
+            {{ ai_analysis }}
+        </div>
     </div>
     {% endif %}
 </div>
 {% endif %}
 
 {% if watermark_result %}
-<div class="card" style="border-left:3px solid #6366f1; padding:16px 20px; margin-bottom:20px;">
-    <div style="font-size:0.78rem; font-weight:700; color:#6366f1; text-transform:uppercase;
-                letter-spacing:0.06em; margin-bottom:6px;">
-        <i class="fas fa-stamp"></i> Watermark Detection
-    </div>
-    <div style="font-size:0.875rem; color:var(--text-secondary);">{{ watermark_result }}</div>
+<div class="card" style="border-left:3px solid #6366f1; padding:14px 18px; margin-bottom:18px;">
+    <div style="font-size:0.72rem; font-weight:700; color:#6366f1; text-transform:uppercase;
+                letter-spacing:0.06em; margin-bottom:5px;"><i class="fas fa-stamp"></i> Watermark</div>
+    <div style="font-size:0.85rem; color:var(--text-secondary);">{{ watermark_result }}</div>
 </div>
 {% endif %}
 
 {% if exif_data %}
-<div class="card" style="margin-bottom:20px;">
+<div class="card" style="margin-bottom:18px;">
     <div class="card-title"><i class="fas fa-circle-info" style="color:#6366f1;"></i> EXIF Metadata</div>
     <div style="display:flex; flex-wrap:wrap; gap:10px;">
         {% for key, val in exif_data.items() %}
-        <div style="background:#fafbfe; border:1px solid var(--card-border); border-radius:8px; padding:10px 14px;">
-            <div style="font-size:0.68rem; color:var(--text-muted); font-weight:700;
-                        text-transform:uppercase; margin-bottom:3px;">{{ key }}</div>
-            <div style="font-size:0.85rem; font-weight:600; color:var(--text-primary);">{{ val }}</div>
+        <div style="background:#fafbfe; border:1px solid var(--card-border); border-radius:8px; padding:9px 13px;">
+            <div style="font-size:0.65rem; color:var(--text-muted); font-weight:700;
+                        text-transform:uppercase; margin-bottom:2px;">{{ key }}</div>
+            <div style="font-size:0.82rem; font-weight:600; color:var(--text-primary);">{{ val }}</div>
         </div>
         {% endfor %}
     </div>
 </div>
 {% endif %}
 
-<!-- Summary -->
 {% if results %}
 {% set violations = results | selectattr('status', 'equalto', 'ALERT') | list %}
-<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:20px;">
-    <div class="stat-card" style="padding:16px; border-top:2px solid #6366f1;">
+
+<!-- Summary -->
+<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:18px;">
+    <div class="stat-card" style="padding:14px; border-top:2px solid #6366f1; border-left:none; border-right:none; border-bottom:none;">
         <div class="stat-label">Assets Checked</div>
-        <div class="stat-value" style="font-size:1.6rem; color:#6366f1;">{{ results|length }}</div>
+        <div class="stat-value" style="font-size:1.5rem; color:#6366f1;">{{ results|length }}</div>
     </div>
-    <div class="stat-card" style="padding:16px; border-top:2px solid #ef4444;">
+    <div class="stat-card" style="padding:14px; border-top:2px solid #ef4444; border-left:none; border-right:none; border-bottom:none;">
         <div class="stat-label">Violations Found</div>
-        <div class="stat-value" style="font-size:1.6rem; color:#ef4444;">{{ violations|length }}</div>
+        <div class="stat-value" style="font-size:1.5rem; color:#ef4444;">{{ violations|length }}</div>
     </div>
-    <div class="stat-card" style="padding:16px; border-top:2px solid #10b981;">
+    <div class="stat-card" style="padding:14px; border-top:2px solid #10b981; border-left:none; border-right:none; border-bottom:none;">
         <div class="stat-label">Highest Match</div>
-        <div class="stat-value" style="font-size:1.6rem; color:#10b981;">
+        <div class="stat-value" style="font-size:1.5rem; color:#10b981;">
             {{ results[0].similarity if results else 0 }}%
         </div>
     </div>
@@ -99,38 +103,34 @@
 <div class="card">
     <div class="card-title">
         <i class="fas fa-chart-bar" style="color:#6366f1;"></i> Detection Results
-        <span style="margin-left:auto; font-size:0.72rem; color:var(--text-muted); font-weight:400;">
-            Confidence breakdown by detection method
+        <span style="margin-left:auto; font-size:0.68rem; color:var(--text-muted); font-weight:400;">
+            Confidence breakdown per method
         </span>
     </div>
 
     {% for r in results %}
     <div style="border:1px solid {{ '#fde8e8' if r.status == 'ALERT' else 'var(--card-border)' }};
-                border-radius:10px; padding:18px; margin-bottom:14px;
-                background:{{ '#fffafa' if r.status == 'ALERT' else 'white' }};
-                transition: all 0.2s;"
-         onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.08)'"
-         onmouseout="this.style.boxShadow='none'">
+                border-radius:10px; padding:16px; margin-bottom:12px;
+                background:{{ '#fffafa' if r.status == 'ALERT' else '#fafbfe' }};">
 
-        <!-- Header -->
         <div style="display:flex; justify-content:space-between; align-items:center;
-                    flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+                    flex-wrap:wrap; gap:10px; margin-bottom:12px;">
             <div>
-                <div style="font-weight:700; color:var(--text-primary); font-size:0.95rem;">
+                <div style="font-weight:700; color:var(--text-primary); font-size:0.9rem;">
                     {{ r.asset_name }}
                 </div>
-                <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">
+                <div style="font-size:0.68rem; color:var(--text-muted); margin-top:2px;">
                     <i class="fas fa-file-image"></i> {{ r.filename }}
                 </div>
             </div>
             <div style="display:flex; align-items:center; gap:10px;">
-                <span style="font-size:1.6rem; font-weight:900; color:{{ r.risk_color }};">
+                <span style="font-size:1.5rem; font-weight:900; color:{{ r.risk_color }};">
                     {{ r.similarity }}%
                 </span>
                 <div>
-                    <span style="background:{{ r.risk_color }}; color:white; padding:4px 12px;
-                                 border-radius:999px; font-size:0.72rem; font-weight:700;
-                                 display:block; text-align:center; margin-bottom:4px;">
+                    <span style="background:{{ r.risk_color }}; color:white; padding:3px 10px;
+                                 border-radius:999px; font-size:0.68rem; font-weight:700;
+                                 display:block; text-align:center; margin-bottom:3px;">
                         {{ r.risk_label }}
                     </span>
                     <span class="{{ 'badge-alert' if r.status == 'ALERT' else 'badge-safe' }} badge">
@@ -140,67 +140,63 @@
             </div>
         </div>
 
-        <!-- Overall bar -->
-        <div class="progress-bar" style="margin-bottom:16px;">
+        <div class="progress-bar" style="margin-bottom:14px;">
             <div class="progress-fill" style="width:{{ r.similarity }}%; background:{{ r.risk_color }};"></div>
         </div>
 
-        <!-- Confidence Explainability Panel -->
-        <div style="background:#fafbfe; border:1px solid var(--card-border); border-radius:8px; padding:14px;">
-            <div style="font-size:0.7rem; font-weight:700; color:var(--text-muted);
-                        text-transform:uppercase; letter-spacing:0.06em; margin-bottom:12px;">
+        <!-- Explainability Panel -->
+        <div style="background:white; border:1px solid var(--card-border); border-radius:8px; padding:13px;">
+            <div style="font-size:0.66rem; font-weight:700; color:var(--text-muted);
+                        text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;">
                 <i class="fas fa-microscope"></i> Why this score?
             </div>
-            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;">
 
-                <!-- Hash -->
-                <div style="background:white; border-radius:8px; padding:12px; border:1px solid #e8ecf8;">
-                    <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
-                        <div style="width:8px; height:8px; border-radius:50%; background:#6366f1; flex-shrink:0;"></div>
-                        <span style="font-size:0.72rem; font-weight:700; color:var(--text-muted);">Hash Fingerprint</span>
+                <div style="background:#fafbff; border-radius:7px; padding:10px; border:1px solid #eef0fb;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:6px;">
+                        <div style="width:7px; height:7px; border-radius:50%; background:#6366f1; flex-shrink:0;"></div>
+                        <span style="font-size:0.68rem; font-weight:700; color:var(--text-muted);">Hash Fingerprint</span>
                     </div>
-                    <div style="font-size:1.3rem; font-weight:800; color:#6366f1; margin-bottom:6px;">
+                    <div style="font-size:1.1rem; font-weight:800; color:#6366f1; margin-bottom:5px;">
                         {{ r.hash_score }}%
                     </div>
-                    <div class="progress-bar">
+                    <div class="progress-bar" style="height:4px;">
                         <div class="progress-fill" style="width:{{ r.hash_score }}%; background:#6366f1;"></div>
                     </div>
-                    <div style="font-size:0.67rem; color:var(--text-muted); margin-top:5px;">
-                        pHash · dHash · aHash · Weight: 20%
+                    <div style="font-size:0.62rem; color:var(--text-muted); margin-top:4px;">
+                        pHash · dHash · aHash · 20%
                     </div>
                 </div>
 
-                <!-- OpenCV -->
-                <div style="background:white; border-radius:8px; padding:12px; border:1px solid #e8ecf8;">
-                    <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
-                        <div style="width:8px; height:8px; border-radius:50%; background:#0ea5e9; flex-shrink:0;"></div>
-                        <span style="font-size:0.72rem; font-weight:700; color:var(--text-muted);">OpenCV Features</span>
+                <div style="background:#fafbff; border-radius:7px; padding:10px; border:1px solid #eef0fb;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:6px;">
+                        <div style="width:7px; height:7px; border-radius:50%; background:#0ea5e9; flex-shrink:0;"></div>
+                        <span style="font-size:0.68rem; font-weight:700; color:var(--text-muted);">OpenCV Features</span>
                     </div>
-                    <div style="font-size:1.3rem; font-weight:800; color:#0ea5e9; margin-bottom:6px;">
+                    <div style="font-size:1.1rem; font-weight:800; color:#0ea5e9; margin-bottom:5px;">
                         {{ r.opencv_score }}%
                     </div>
-                    <div class="progress-bar">
+                    <div class="progress-bar" style="height:4px;">
                         <div class="progress-fill" style="width:{{ r.opencv_score }}%; background:#0ea5e9;"></div>
                     </div>
-                    <div style="font-size:0.67rem; color:var(--text-muted); margin-top:5px;">
-                        SIFT · ORB keypoints · Weight: 30%
+                    <div style="font-size:0.62rem; color:var(--text-muted); margin-top:4px;">
+                        SIFT · ORB keypoints · 30%
                     </div>
                 </div>
 
-                <!-- MobileNet -->
-                <div style="background:white; border-radius:8px; padding:12px; border:1px solid #e8ecf8;">
-                    <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
-                        <div style="width:8px; height:8px; border-radius:50%; background:#10b981; flex-shrink:0;"></div>
-                        <span style="font-size:0.72rem; font-weight:700; color:var(--text-muted);">MobileNet AI</span>
+                <div style="background:#fafbff; border-radius:7px; padding:10px; border:1px solid #eef0fb;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:6px;">
+                        <div style="width:7px; height:7px; border-radius:50%; background:#10b981; flex-shrink:0;"></div>
+                        <span style="font-size:0.68rem; font-weight:700; color:var(--text-muted);">MobileNet AI</span>
                     </div>
-                    <div style="font-size:1.3rem; font-weight:800; color:#10b981; margin-bottom:6px;">
+                    <div style="font-size:1.1rem; font-weight:800; color:#10b981; margin-bottom:5px;">
                         {{ r.dl_score }}%
                     </div>
-                    <div class="progress-bar">
+                    <div class="progress-bar" style="height:4px;">
                         <div class="progress-fill" style="width:{{ r.dl_score }}%; background:#10b981;"></div>
                     </div>
-                    <div style="font-size:0.67rem; color:var(--text-muted); margin-top:5px;">
-                        Deep learning embeddings · Weight: 50%
+                    <div style="font-size:0.62rem; color:var(--text-muted); margin-top:4px;">
+                        Deep learning · 50% weight
                     </div>
                 </div>
             </div>
@@ -209,5 +205,11 @@
     {% endfor %}
 </div>
 {% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    initFileUpload('scan-zone', 'scan-img', 'scan-title', 'scan-sub', 'image');
+});
+</script>
 
 {% endblock %}

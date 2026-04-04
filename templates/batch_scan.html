@@ -4,41 +4,34 @@
 <div class="card">
     <div class="card-title">
         <i class="fas fa-layer-group" style="color:#6366f1;"></i> Batch Image Scan
-        <span style="margin-left:auto; font-size:0.72rem; color:var(--text-muted); font-weight:400;">
+        <span style="margin-left:auto; font-size:0.7rem; color:var(--text-muted); font-weight:400;">
             Upload a ZIP · Scan up to 50 images at once
         </span>
     </div>
 
     <form method="POST" enctype="multipart/form-data">
-        <div style="border:2px dashed #c7d2fe; border-radius:12px; padding:32px;
-                    text-align:center; background:#fafbff; cursor:pointer;
-                    transition:all 0.2s; margin-bottom:16px;"
-             onclick="document.getElementById('zip-input').click()"
-             id="drop-zone">
-            <i class="fas fa-cloud-arrow-up" style="font-size:2rem; color:#6366f1;
-               margin-bottom:12px; display:block;"></i>
-            <div style="font-weight:700; color:var(--text-primary); margin-bottom:4px;">
-                Drop your ZIP file here
+        <div style="margin-bottom:14px;">
+            <label class="form-label">Upload ZIP File</label>
+            <input type="file" name="zipfile" id="zip-input" accept=".zip" required class="file-upload-real">
+            <div class="file-upload-zone" id="zip-zone">
+                <div class="upload-icon"><i class="fas fa-file-zipper"></i></div>
+                <div class="upload-text">
+                    <div class="upload-title" id="zip-title">Click or drag ZIP file here</div>
+                    <div class="upload-sub" id="zip-sub">
+                        .zip file · JPG, PNG, WebP inside · 50 images recommended max
+                    </div>
+                </div>
+                <div class="upload-btn">Browse</div>
             </div>
-            <div style="font-size:0.8rem; color:var(--text-muted);">
-                or click to browse · JPG, PNG, WebP inside · Max 50 images recommended
-            </div>
-            <input type="file" name="zipfile" id="zip-input" accept=".zip" required
-                   style="display:none;" onchange="updateFileName(this)">
         </div>
-        <div id="file-name" style="font-size:0.82rem; color:#6366f1; font-weight:600;
-                                    margin-bottom:14px; display:none;">
-            <i class="fas fa-check-circle"></i> <span id="fname-text"></span>
-        </div>
-
-        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; height:44px;">
+        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; height:42px;">
             <i class="fas fa-rocket"></i> Start Batch Scan
         </button>
     </form>
 
     {% if error %}
     <div style="margin-top:14px; background:var(--danger-light); border:1px solid #fecdd3;
-                border-radius:8px; padding:12px 16px; color:var(--danger); font-size:0.875rem;
+                border-radius:8px; padding:11px 14px; color:var(--danger); font-size:0.85rem;
                 display:flex; gap:8px; align-items:center;">
         <i class="fas fa-circle-xmark"></i> {{ error }}
     </div>
@@ -46,22 +39,22 @@
 </div>
 
 {% if summary %}
-<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px;">
-    <div class="stat-card" style="padding:16px; border-top:2px solid #6366f1;">
+<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:18px;">
+    <div class="stat-card" style="padding:14px; border-top:2px solid #6366f1; border-left:none; border-right:none; border-bottom:none;">
         <div class="stat-label">Scanned</div>
-        <div class="stat-value" style="font-size:1.6rem; color:#6366f1;">{{ summary.total }}</div>
+        <div class="stat-value" style="font-size:1.5rem; color:#6366f1;">{{ summary.total }}</div>
     </div>
-    <div class="stat-card" style="padding:16px; border-top:2px solid #ef4444;">
+    <div class="stat-card" style="padding:14px; border-top:2px solid #ef4444; border-left:none; border-right:none; border-bottom:none;">
         <div class="stat-label">Violations</div>
-        <div class="stat-value" style="font-size:1.6rem; color:#ef4444;">{{ summary.violations }}</div>
+        <div class="stat-value" style="font-size:1.5rem; color:#ef4444;">{{ summary.violations }}</div>
     </div>
-    <div class="stat-card" style="padding:16px; border-top:2px solid #10b981;">
+    <div class="stat-card" style="padding:14px; border-top:2px solid #10b981; border-left:none; border-right:none; border-bottom:none;">
         <div class="stat-label">Safe</div>
-        <div class="stat-value" style="font-size:1.6rem; color:#10b981;">{{ summary.safe }}</div>
+        <div class="stat-value" style="font-size:1.5rem; color:#10b981;">{{ summary.safe }}</div>
     </div>
-    <div class="stat-card" style="padding:16px; border-top:2px solid #f97316;">
+    <div class="stat-card" style="padding:14px; border-top:2px solid #f97316; border-left:none; border-right:none; border-bottom:none;">
         <div class="stat-label">Violation Rate</div>
-        <div class="stat-value" style="font-size:1.6rem; color:#f97316;">{{ summary.violation_rate }}%</div>
+        <div class="stat-value" style="font-size:1.5rem; color:#f97316;">{{ summary.violation_rate }}%</div>
     </div>
 </div>
 
@@ -76,59 +69,54 @@
 <div class="card">
     <div class="card-title">
         <i class="fas fa-list-check" style="color:#6366f1;"></i> Results
-        <span style="margin-left:auto; font-size:0.72rem; color:var(--text-muted); font-weight:400;">
+        <span style="margin-left:auto; font-size:0.68rem; color:var(--text-muted); font-weight:400;">
             Sorted by similarity
         </span>
     </div>
-
     <table class="vx-table">
         <thead>
             <tr>
                 <th>File</th>
                 <th>Matched Asset</th>
-                <th>Confidence Breakdown</th>
-                <th>Overall</th>
+                <th>Confidence</th>
+                <th>Score</th>
                 <th>Status</th>
             </tr>
         </thead>
         <tbody>
             {% for r in results %}
             <tr>
-                <td>
-                    <div style="font-weight:600; color:var(--text-primary); font-size:0.82rem;">
-                        {{ r.filename }}
-                    </div>
+                <td style="font-weight:600; color:var(--text-primary); font-size:0.82rem;">
+                    {{ r.filename }}
                 </td>
-                <td style="font-size:0.82rem; color:var(--text-secondary);">
-                    {{ r.asset_name }}
-                </td>
-                <td style="min-width:180px;">
-                    <div style="display:flex; flex-direction:column; gap:4px;">
+                <td style="font-size:0.82rem; color:var(--text-secondary);">{{ r.asset_name }}</td>
+                <td style="min-width:160px;">
+                    <div style="display:flex; flex-direction:column; gap:3px;">
                         <div style="display:flex; align-items:center; gap:6px;">
-                            <span style="font-size:0.65rem; color:#6366f1; font-weight:700; width:46px;">Hash</span>
-                            <div class="progress-bar" style="flex:1; height:4px;">
+                            <span style="font-size:0.62rem; color:#6366f1; font-weight:700; width:42px;">Hash</span>
+                            <div class="progress-bar" style="flex:1; height:3px;">
                                 <div class="progress-fill" style="width:{{ r.hash_score }}%; background:#6366f1;"></div>
                             </div>
-                            <span style="font-size:0.65rem; color:var(--text-muted); width:30px;">{{ r.hash_score }}%</span>
+                            <span style="font-size:0.62rem; color:var(--text-muted); width:28px;">{{ r.hash_score }}%</span>
                         </div>
                         <div style="display:flex; align-items:center; gap:6px;">
-                            <span style="font-size:0.65rem; color:#0ea5e9; font-weight:700; width:46px;">OpenCV</span>
-                            <div class="progress-bar" style="flex:1; height:4px;">
+                            <span style="font-size:0.62rem; color:#0ea5e9; font-weight:700; width:42px;">OpenCV</span>
+                            <div class="progress-bar" style="flex:1; height:3px;">
                                 <div class="progress-fill" style="width:{{ r.opencv_score }}%; background:#0ea5e9;"></div>
                             </div>
-                            <span style="font-size:0.65rem; color:var(--text-muted); width:30px;">{{ r.opencv_score }}%</span>
+                            <span style="font-size:0.62rem; color:var(--text-muted); width:28px;">{{ r.opencv_score }}%</span>
                         </div>
                         <div style="display:flex; align-items:center; gap:6px;">
-                            <span style="font-size:0.65rem; color:#10b981; font-weight:700; width:46px;">AI/DL</span>
-                            <div class="progress-bar" style="flex:1; height:4px;">
+                            <span style="font-size:0.62rem; color:#10b981; font-weight:700; width:42px;">AI/DL</span>
+                            <div class="progress-bar" style="flex:1; height:3px;">
                                 <div class="progress-fill" style="width:{{ r.dl_score }}%; background:#10b981;"></div>
                             </div>
-                            <span style="font-size:0.65rem; color:var(--text-muted); width:30px;">{{ r.dl_score }}%</span>
+                            <span style="font-size:0.62rem; color:var(--text-muted); width:28px;">{{ r.dl_score }}%</span>
                         </div>
                     </div>
                 </td>
                 <td>
-                    <span style="font-size:1rem; font-weight:800;
+                    <span style="font-size:0.95rem; font-weight:800;
                                  color:{{ '#ef4444' if r.similarity >= 70 else '#f59e0b' if r.similarity >= 50 else '#10b981' }};">
                         {{ r.similarity }}%
                     </span>
@@ -150,16 +138,9 @@
 {% endif %}
 
 <script>
-function updateFileName(input) {
-    const div = document.getElementById('file-name');
-    const span = document.getElementById('fname-text');
-    if (input.files[0]) {
-        span.textContent = input.files[0].name;
-        div.style.display = 'block';
-        document.getElementById('drop-zone').style.borderColor = '#6366f1';
-        document.getElementById('drop-zone').style.background = '#f5f7ff';
-    }
-}
+document.addEventListener('DOMContentLoaded', () => {
+    initFileUpload('zip-zone', 'zip-input', 'zip-title', 'zip-sub', 'zip');
+});
 </script>
 
 {% endblock %}

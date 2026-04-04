@@ -5,40 +5,35 @@
     <div class="card-title">
         <i class="fas fa-film" style="color:#8b5cf6;"></i> Video Scan
         <span class="badge badge-info" style="margin-left:8px;">Enhanced</span>
-        <span style="margin-left:auto; font-size:0.72rem; color:var(--text-muted); font-weight:400;">
-            Frame extraction + 5-region detection per frame
+        <span style="margin-left:auto; font-size:0.7rem; color:var(--text-muted); font-weight:400;">
+            Frame extraction + 5-region detection
         </span>
     </div>
 
-    <div style="background:#eef2ff; border:1px solid #c7d2fe; border-radius:8px;
-                padding:12px 16px; margin-bottom:20px; font-size:0.82rem; color:#4338ca;
-                display:flex; gap:8px; align-items:flex-start;">
+    <div style="background:#f5f3ff; border:1px solid #ddd6fe; border-radius:8px;
+                padding:11px 14px; margin-bottom:18px; font-size:0.8rem; color:#6d28d9;
+                display:flex; gap:8px; align-items:flex-start; line-height:1.5;">
         <i class="fas fa-circle-info" style="margin-top:2px; flex-shrink:0;"></i>
         <span>
-            <strong>Enhanced Detection:</strong> Scans full frame + center content + corner watermark zones + scoreboard strip.
-            Detects violations even if logo is cropped or removed — matches actual gameplay content.
+            <strong>Enhanced:</strong> Scans full frame + center content + watermark corners + scoreboard.
+            Detects violations even if logo is cropped or AI-removed.
         </span>
     </div>
 
     <form method="POST" enctype="multipart/form-data" id="video-form" onsubmit="showProgress()">
-        <div style="border:2px dashed #c7d2fe; border-radius:12px; padding:32px;
-                    text-align:center; background:#fafbff; cursor:pointer;
-                    transition:all 0.2s; margin-bottom:16px;"
-             onclick="document.getElementById('video-input').click()">
-            <i class="fas fa-film" style="font-size:2rem; color:#8b5cf6; margin-bottom:12px; display:block;"></i>
-            <div style="font-weight:700; color:var(--text-primary); margin-bottom:4px;">
-                Drop your video here
+        <div style="margin-bottom:14px;">
+            <label class="form-label">Upload Suspect Video</label>
+            <input type="file" name="video" id="video-input" accept="video/*" required class="file-upload-real">
+            <div class="file-upload-zone" id="video-zone">
+                <div class="upload-icon"><i class="fas fa-film"></i></div>
+                <div class="upload-text">
+                    <div class="upload-title" id="video-title">Click or drag video here</div>
+                    <div class="upload-sub" id="video-sub">
+                        MP4, AVI, MOV, MKV · Max 100MB · Highlight clips supported
+                    </div>
+                </div>
+                <div class="upload-btn">Browse</div>
             </div>
-            <div style="font-size:0.8rem; color:var(--text-muted);">
-                MP4, AVI, MOV, MKV · Max 100MB · Highlight clips welcome
-            </div>
-            <input type="file" name="video" id="video-input" accept="video/*" required
-                   style="display:none;" onchange="updateVideoName(this)">
-        </div>
-
-        <div id="video-name" style="font-size:0.82rem; color:#8b5cf6; font-weight:600;
-                                     margin-bottom:14px; display:none;">
-            <i class="fas fa-check-circle"></i> <span id="vname-text"></span>
         </div>
 
         <div style="display:flex; gap:12px; align-items:flex-end; margin-bottom:16px;">
@@ -50,34 +45,33 @@
                     <option value="5">Every 5 seconds — Fast preview</option>
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary" style="height:44px; padding:0 24px; white-space:nowrap;">
+            <button type="submit" class="btn btn-primary" style="height:42px; padding:0 22px; white-space:nowrap;">
                 <i class="fas fa-magnifying-glass"></i> Scan Video
             </button>
         </div>
     </form>
 
-    <!-- Progress Indicator (shows during scan) -->
+    <!-- Progress Indicator -->
     <div id="scan-progress" style="display:none;">
-        <div style="background:#fafbff; border:1px solid #c7d2fe; border-radius:10px; padding:20px;">
+        <div style="background:#fafbff; border:1px solid #c7d2fe; border-radius:10px; padding:18px;">
             <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
-                <div style="width:36px; height:36px; border-radius:50%;
+                <div style="width:34px; height:34px; border-radius:50%;
                             border:3px solid #6366f1; border-top-color:transparent;
                             animation:spin 0.8s linear infinite; flex-shrink:0;"></div>
                 <div>
-                    <div style="font-weight:700; color:var(--text-primary); margin-bottom:2px;"
-                         id="progress-title">Extracting frames...</div>
-                    <div style="font-size:0.78rem; color:var(--text-muted);" id="progress-sub">
+                    <div style="font-weight:700; color:var(--text-primary); font-size:0.875rem; margin-bottom:2px;"
+                         id="progress-title">Uploading video...</div>
+                    <div style="font-size:0.75rem; color:var(--text-muted);" id="progress-sub">
                         This may take 1-3 minutes depending on video length
                     </div>
                 </div>
             </div>
-            <div class="progress-bar" style="height:8px; margin-bottom:10px;">
+            <div class="progress-bar" style="height:7px; margin-bottom:8px;">
                 <div id="progress-fill" class="progress-fill"
-                     style="background:linear-gradient(90deg,#6366f1,#8b5cf6); width:0%;
-                            transition:width 0.5s ease;"></div>
+                     style="background:linear-gradient(90deg,#6366f1,#8b5cf6); width:0%;"></div>
             </div>
-            <div style="display:flex; justify-content:space-between; font-size:0.72rem; color:var(--text-muted);">
-                <span id="progress-step">Step 1/4: Uploading video</span>
+            <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-muted);">
+                <span id="progress-step">Step 1/4: Uploading</span>
                 <span id="progress-pct">0%</span>
             </div>
         </div>
@@ -85,22 +79,22 @@
 </div>
 
 {% if video_info %}
-<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px;">
-    <div class="stat-card" style="padding:16px; border-top:2px solid #6366f1;">
+<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:18px;">
+    <div class="stat-card" style="padding:14px; border-top:2px solid #6366f1; border-left:none; border-right:none; border-bottom:none;">
         <div class="stat-label">Frames Scanned</div>
-        <div class="stat-value" style="font-size:1.6rem; color:#6366f1;">{{ video_info.frames_scanned }}</div>
+        <div class="stat-value" style="font-size:1.5rem; color:#6366f1;">{{ video_info.frames_scanned }}</div>
     </div>
-    <div class="stat-card" style="padding:16px; border-top:2px solid #8b5cf6;">
+    <div class="stat-card" style="padding:14px; border-top:2px solid #8b5cf6; border-left:none; border-right:none; border-bottom:none;">
         <div class="stat-label">Regions Checked</div>
-        <div class="stat-value" style="font-size:1.6rem; color:#8b5cf6;">{{ video_info.frames_scanned * 5 }}</div>
+        <div class="stat-value" style="font-size:1.5rem; color:#8b5cf6;">{{ video_info.frames_scanned * 5 }}</div>
     </div>
-    <div class="stat-card" style="padding:16px; border-top:2px solid #ef4444;">
+    <div class="stat-card" style="padding:14px; border-top:2px solid #ef4444; border-left:none; border-right:none; border-bottom:none;">
         <div class="stat-label">Violations</div>
-        <div class="stat-value" style="font-size:1.6rem; color:#ef4444;">{{ violations|length }}</div>
+        <div class="stat-value" style="font-size:1.5rem; color:#ef4444;">{{ violations|length }}</div>
     </div>
-    <div class="stat-card" style="padding:16px; border-top:2px solid #10b981;">
+    <div class="stat-card" style="padding:14px; border-top:2px solid #10b981; border-left:none; border-right:none; border-bottom:none;">
         <div class="stat-label">Duration</div>
-        <div class="stat-value" style="font-size:1.6rem; color:#10b981;">{{ video_info.duration }}s</div>
+        <div class="stat-value" style="font-size:1.5rem; color:#10b981;">{{ video_info.duration }}s</div>
     </div>
 </div>
 {% endif %}
@@ -111,36 +105,35 @@
         <i class="fas fa-triangle-exclamation" style="color:#ef4444;"></i> Violations Found
     </div>
 
-    <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px;
-                padding:10px 14px; margin-bottom:16px; font-size:0.78rem; color:#92400e;">
+    <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:7px;
+                padding:9px 13px; margin-bottom:14px; font-size:0.75rem; color:#92400e;">
         <strong>Region Key:</strong>
-        <span style="margin-left:6px;">🖥 full</span>
-        <span style="margin-left:8px;">🎯 center (content match — no logo needed)</span>
-        <span style="margin-left:8px;">↖↗ top corners (watermark zones)</span>
-        <span style="margin-left:8px;">📊 bottom (scoreboard)</span>
+        <span style="margin:0 6px;">🖥 full</span>
+        <span style="margin:0 6px;">🎯 center (content match)</span>
+        <span style="margin:0 6px;">↖↗ watermark corners</span>
+        <span style="margin:0 6px;">📊 scoreboard</span>
     </div>
 
     {% for v in violations %}
-    <div style="display:flex; align-items:flex-start; gap:16px; padding:16px;
-                border-radius:10px; margin-bottom:12px;
+    <div style="display:flex; align-items:flex-start; gap:14px; padding:14px;
+                border-radius:10px; margin-bottom:10px;
                 background:var(--danger-light); border:1px solid #fecdd3;">
         <img src="/uploads/video_frames/{{ v.frame_filename }}"
-             style="width:130px; height:73px; object-fit:cover;
-                    border-radius:8px; border:1px solid #fecdd3; flex-shrink:0;">
+             style="width:120px; height:68px; object-fit:cover; border-radius:7px;
+                    border:1px solid #fecdd3; flex-shrink:0;">
         <div style="flex:1;">
-            <div style="font-weight:700; margin-bottom:6px; color:var(--text-primary);">
+            <div style="font-weight:700; margin-bottom:5px; color:var(--text-primary); font-size:0.875rem;">
                 {{ v.asset_name }}
             </div>
-            <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
-                <span style="font-size:0.8rem; color:var(--text-muted);">
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                <span style="font-size:0.78rem; color:var(--text-muted);">
                     <i class="fas fa-clock"></i>
                     <strong style="color:#ef4444;">{{ v.time_str }}</strong>
                 </span>
-                <span style="font-size:0.8rem; color:var(--text-muted);">
+                <span style="font-size:0.78rem; color:var(--text-muted);">
                     Match: <strong>{{ v.similarity }}%</strong>
                 </span>
-                <span style="background:#f1f5f9; color:var(--text-secondary); padding:2px 8px;
-                             border-radius:999px; font-size:0.72rem; font-weight:600;">
+                <span class="badge badge-info" style="font-size:0.68rem;">
                     {{ v.get('matched_region', 'full') }}
                 </span>
                 {% if v.get('is_scene_change') %}
@@ -148,12 +141,12 @@
                 {% endif %}
             </div>
             {% if v.get('matched_region') == 'center' %}
-            <div style="font-size:0.75rem; color:#8b5cf6; font-weight:600; margin-top:6px;">
-                ⚠ Content match — violation detected even without visible logo
+            <div style="font-size:0.72rem; color:#8b5cf6; font-weight:600; margin-top:5px;">
+                ⚠ Content match — detected even without visible logo
             </div>
             {% endif %}
         </div>
-        <span class="badge badge-alert" style="font-size:0.82rem; padding:6px 12px; flex-shrink:0;">
+        <span class="badge badge-alert" style="font-size:0.78rem; padding:5px 10px; flex-shrink:0;">
             VIOLATION
         </span>
     </div>
@@ -162,12 +155,11 @@
 
 {% elif video_info %}
 <div class="card" style="text-align:center; padding:48px;">
-    <i class="fas fa-shield-check" style="font-size:2.5rem; color:#10b981;
-       margin-bottom:14px; display:block;"></i>
-    <div style="font-weight:700; font-size:1.1rem; color:var(--text-primary); margin-bottom:6px;">
+    <i class="fas fa-shield-check" style="font-size:2.5rem; color:#10b981; margin-bottom:14px; display:block;"></i>
+    <div style="font-weight:700; font-size:1rem; color:var(--text-primary); margin-bottom:5px;">
         No violations detected
     </div>
-    <div style="font-size:0.85rem; color:var(--text-muted);">
+    <div style="font-size:0.82rem; color:var(--text-muted);">
         {{ video_info.frames_scanned * 5 }} regions checked — this video is clean.
     </div>
 </div>
@@ -178,42 +170,33 @@
 </style>
 
 <script>
-function updateVideoName(input) {
-    const div = document.getElementById('video-name');
-    const span = document.getElementById('vname-text');
-    if (input.files[0]) {
-        span.textContent = input.files[0].name + ' (' + (input.files[0].size / 1024 / 1024).toFixed(1) + ' MB)';
-        div.style.display = 'block';
-    }
-}
+document.addEventListener('DOMContentLoaded', () => {
+    initFileUpload('video-zone', 'video-input', 'video-title', 'video-sub', 'video');
+});
 
 function showProgress() {
     document.getElementById('scan-progress').style.display = 'block';
-    document.getElementById('video-form').querySelector('button[type="submit"]').disabled = true;
+    document.querySelector('#video-form button[type="submit"]').disabled = true;
 
     const steps = [
         [0, 15, 'Step 1/4: Uploading video', 'Transferring to server...'],
         [15, 45, 'Step 2/4: Extracting frames', 'Pulling keyframes + scene cuts...'],
-        [45, 80, 'Step 3/4: Running AI detection', 'Checking 5 regions per frame...'],
-        [80, 95, 'Step 4/4: Finalising results', 'Recording blockchain evidence...'],
+        [45, 80, 'Step 3/4: AI detection', 'Checking 5 regions per frame...'],
+        [80, 95, 'Step 4/4: Finalising', 'Recording blockchain evidence...'],
     ];
 
-    let currentStep = 0;
-    let currentPct = 0;
-
+    let step = 0, pct = 0;
     const interval = setInterval(() => {
-        if (currentStep >= steps.length) { clearInterval(interval); return; }
-        const [start, end, title, sub] = steps[currentStep];
-        if (currentPct < end) {
-            currentPct = Math.min(currentPct + 1, end);
-            document.getElementById('progress-fill').style.width = currentPct + '%';
-            document.getElementById('progress-pct').textContent = currentPct + '%';
+        if (step >= steps.length) { clearInterval(interval); return; }
+        const [, end, title, sub] = steps[step];
+        if (pct < end) {
+            pct = Math.min(pct + 1, end);
+            document.getElementById('progress-fill').style.width = pct + '%';
+            document.getElementById('progress-pct').textContent = pct + '%';
             document.getElementById('progress-title').textContent = title;
             document.getElementById('progress-sub').textContent = sub;
             document.getElementById('progress-step').textContent = title;
-        } else {
-            currentStep++;
-        }
+        } else { step++; }
     }, 150);
 }
 </script>
