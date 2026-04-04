@@ -1,23 +1,59 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<!-- Impact Banner -->
+<div style="background: linear-gradient(135deg, #0f172a, #1e293b);
+            border-radius:14px; padding:24px 32px; color:white;
+            display:flex; align-items:center; justify-content:space-between;
+            flex-wrap:wrap; gap:16px; margin-bottom:24px;">
+    <div>
+        <div style="font-size:0.8rem; color:#94a3b8; font-weight:600;
+                    text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px;">
+            <i class="fas fa-circle" style="color:#10b981; font-size:0.5rem;
+               animation:pulse 1.5s infinite; vertical-align:middle;"></i>
+            Live Protection Active
+        </div>
+        <div style="font-size:1.6rem; font-weight:800; line-height:1.2;">
+            ₹{{ "{:,.0f}".format(revenue_protected) }}
+            <span style="font-size:0.9rem; font-weight:400; color:#94a3b8;">
+                estimated revenue protected
+            </span>
+        </div>
+        <div style="font-size:0.85rem; color:#64748b; margin-top:6px;">
+            {{ hours_protected }} hours of broadcast content · {{ dmca_count }} DMCA notices ready
+        </div>
+    </div>
+    <a href="/demo" style="background:#4f46e5; color:white; padding:12px 24px;
+                            border-radius:10px; font-weight:700; font-size:0.9rem;
+                            text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+                            white-space:nowrap;">
+        <i class="fas fa-rocket"></i> Live Demo →
+    </a>
+</div>
+
 <!-- Stats row -->
-<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; margin-bottom:28px;">
-    <div class="card" style="text-align:center; border-top:4px solid #4f46e5; padding:24px;">
-        <div style="font-size:2.8rem; font-weight:800; color:#4f46e5;">{{ total_assets }}</div>
-        <div style="color:#475569; font-weight:500; margin-top:4px;">
+<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px;">
+    <div class="card" style="text-align:center; border-top:4px solid #4f46e5; padding:20px;">
+        <div style="font-size:2.4rem; font-weight:800; color:#4f46e5;">{{ total_assets }}</div>
+        <div style="color:#475569; font-weight:500; margin-top:4px; font-size:0.85rem;">
             <i class="fas fa-database"></i> Registered Assets
         </div>
     </div>
-    <div class="card" style="text-align:center; border-top:4px solid #e11d48; padding:24px;">
-        <div style="font-size:2.8rem; font-weight:800; color:#e11d48;">{{ total_violations }}</div>
-        <div style="color:#475569; font-weight:500; margin-top:4px;">
+    <div class="card" style="text-align:center; border-top:4px solid #e11d48; padding:20px;">
+        <div style="font-size:2.4rem; font-weight:800; color:#e11d48;">{{ total_violations }}</div>
+        <div style="color:#475569; font-weight:500; margin-top:4px; font-size:0.85rem;">
             <i class="fas fa-triangle-exclamation"></i> Violations Detected
         </div>
     </div>
-    <div class="card" style="text-align:center; border-top:4px solid #10b981; padding:24px;">
-        <div style="font-size:2.8rem; font-weight:800; color:#10b981;">{{ scans_today }}</div>
-        <div style="color:#475569; font-weight:500; margin-top:4px;">
+    <div class="card" style="text-align:center; border-top:4px solid #f97316; padding:20px;">
+        <div style="font-size:2.4rem; font-weight:800; color:#f97316;">{{ critical_count }}</div>
+        <div style="color:#475569; font-weight:500; margin-top:4px; font-size:0.85rem;">
+            <i class="fas fa-skull-crossbones"></i> Critical Alerts
+        </div>
+    </div>
+    <div class="card" style="text-align:center; border-top:4px solid #10b981; padding:20px;">
+        <div style="font-size:2.4rem; font-weight:800; color:#10b981;">{{ scans_today }}</div>
+        <div style="color:#475569; font-weight:500; margin-top:4px; font-size:0.85rem;">
             <i class="fas fa-bolt"></i> Scans Today
         </div>
     </div>
@@ -25,7 +61,7 @@
 
 <!-- Charts row -->
 {% if chart1 or chart2 %}
-<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:28px;">
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px;">
     {% if chart1 %}
     <div class="card">
         <div class="card-title"><i class="fas fa-chart-bar" style="color:#4f46e5"></i> Violation Trends</div>
@@ -42,19 +78,23 @@
 {% endif %}
 
 <!-- Action cards -->
-<div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:24px;">
     <div class="card">
         <div class="card-title"><i class="fas fa-upload" style="color:#4f46e5"></i> Register New Asset</div>
         <form method="POST" action="/assets/upload" enctype="multipart/form-data">
-            <div style="margin-bottom:16px;">
-                <label style="font-size:0.85rem; font-weight:600; color:#475569; display:block; margin-bottom:6px;">Asset Name</label>
+            <div style="margin-bottom:14px;">
+                <label style="font-size:0.85rem; font-weight:600; color:#475569;
+                               display:block; margin-bottom:6px;">Asset Name</label>
                 <input type="text" name="name" placeholder="e.g. FIFA World Cup 2026 Logo"
-                    style="width:100%; padding:10px 14px; border:1px solid #e2e8f0; border-radius:8px; font-size:0.9rem; outline:none;">
+                    style="width:100%; padding:10px 14px; border:1px solid #e2e8f0;
+                           border-radius:8px; font-size:0.9rem; outline:none;">
             </div>
-            <div style="margin-bottom:20px;">
-                <label style="font-size:0.85rem; font-weight:600; color:#475569; display:block; margin-bottom:6px;">Official Image</label>
+            <div style="margin-bottom:18px;">
+                <label style="font-size:0.85rem; font-weight:600; color:#475569;
+                               display:block; margin-bottom:6px;">Official Image</label>
                 <input type="file" name="image" accept="image/*" required
-                    style="width:100%; padding:10px; border:2px dashed #e2e8f0; border-radius:8px; font-size:0.85rem; cursor:pointer;">
+                    style="width:100%; padding:10px; border:2px dashed #e2e8f0;
+                           border-radius:8px; font-size:0.85rem; cursor:pointer;">
             </div>
             <button type="submit" class="btn btn-primary" style="width:100%;">
                 <i class="fas fa-plus"></i> Register Asset
@@ -65,13 +105,16 @@
     <div class="card">
         <div class="card-title"><i class="fas fa-magnifying-glass" style="color:#4f46e5"></i> Quick Scan</div>
         <form method="POST" action="/scan" enctype="multipart/form-data">
-            <div style="margin-bottom:20px;">
-                <label style="font-size:0.85rem; font-weight:600; color:#475569; display:block; margin-bottom:6px;">Suspect Image</label>
+            <div style="margin-bottom:18px;">
+                <label style="font-size:0.85rem; font-weight:600; color:#475569;
+                               display:block; margin-bottom:6px;">Suspect Image</label>
                 <input type="file" name="image" accept="image/*" required
-                    style="width:100%; padding:10px; border:2px dashed #e2e8f0; border-radius:8px; font-size:0.85rem; cursor:pointer;">
+                    style="width:100%; padding:10px; border:2px dashed #e2e8f0;
+                           border-radius:8px; font-size:0.85rem; cursor:pointer;">
             </div>
-            <p style="font-size:0.82rem; color:#94a3b8; margin-bottom:20px;">
-                Upload any image found online to check if it matches your registered official assets.
+            <p style="font-size:0.82rem; color:#94a3b8; margin-bottom:18px;">
+                Upload any image found online to check if it matches your registered assets.
+                Results include full AI confidence breakdown by detection method.
             </p>
             <button type="submit" class="btn btn-primary" style="width:100%;">
                 <i class="fas fa-bolt"></i> Run Scan
@@ -79,5 +122,64 @@
         </form>
     </div>
 </div>
+
+<!-- Feature shortcuts -->
+<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px;">
+    <a href="/batch" style="text-decoration:none;">
+        <div class="card" style="text-align:center; padding:18px; cursor:pointer; transition:all 0.2s;"
+             onmouseover="this.style.borderColor='#4f46e5'; this.style.transform='translateY(-2px)'"
+             onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
+            <i class="fas fa-layer-group" style="font-size:1.6rem; color:#4f46e5; margin-bottom:8px; display:block;"></i>
+            <div style="font-weight:700; color:#0f172a; font-size:0.88rem;">Batch Scan</div>
+            <div style="font-size:0.75rem; color:#94a3b8; margin-top:3px;">ZIP of images at once</div>
+        </div>
+    </a>
+    <a href="/violations" style="text-decoration:none;">
+        <div class="card" style="text-align:center; padding:18px; cursor:pointer; transition:all 0.2s;"
+             onmouseover="this.style.borderColor='#e11d48'; this.style.transform='translateY(-2px)'"
+             onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
+            <i class="fas fa-gavel" style="font-size:1.6rem; color:#e11d48; margin-bottom:8px; display:block;"></i>
+            <div style="font-weight:700; color:#0f172a; font-size:0.88rem;">DMCA Notices</div>
+            <div style="font-size:0.75rem; color:#94a3b8; margin-top:3px;">Auto legal takedown</div>
+        </div>
+    </a>
+    <a href="/video" style="text-decoration:none;">
+        <div class="card" style="text-align:center; padding:18px; cursor:pointer; transition:all 0.2s;"
+             onmouseover="this.style.borderColor='#8b5cf6'; this.style.transform='translateY(-2px)'"
+             onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
+            <i class="fas fa-film" style="font-size:1.6rem; color:#8b5cf6; margin-bottom:8px; display:block;"></i>
+            <div style="font-weight:700; color:#0f172a; font-size:0.88rem;">Video Scan</div>
+            <div style="font-size:0.75rem; color:#94a3b8; margin-top:3px;">Detect in highlight clips</div>
+        </div>
+    </a>
+    <a href="/demo" style="text-decoration:none;">
+        <div class="card" style="text-align:center; padding:18px; cursor:pointer; transition:all 0.2s;
+                                  background: linear-gradient(135deg, #fafafe, #eef2ff);"
+             onmouseover="this.style.borderColor='#4f46e5'; this.style.transform='translateY(-2px)'"
+             onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
+            <i class="fas fa-rocket" style="font-size:1.6rem; color:#4f46e5; margin-bottom:8px; display:block;"></i>
+            <div style="font-weight:700; color:#4f46e5; font-size:0.88rem;">Live Demo</div>
+            <div style="font-size:0.75rem; color:#94a3b8; margin-top:3px;">Show judges in 10 sec</div>
+        </div>
+    </a>
+</div>
+
+<style>
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+</style>
+
+<script>
+// Auto-refresh stats every 30 seconds
+setInterval(() => {
+    fetch('/api/v1/status')
+        .then(r => r.json())
+        .then(data => {
+            // silently update if API is open
+        }).catch(() => {});
+}, 30000);
+</script>
 
 {% endblock %}

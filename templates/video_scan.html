@@ -4,11 +4,16 @@
 <div class="card" style="border-top: 4px solid #4f46e5;">
     <div class="card-title">
         <i class="fas fa-film" style="color:#4f46e5"></i> Video Scanner
-        <span class="badge badge-info" style="margin-left:8px;">NEW</span>
+        <span class="badge badge-info" style="margin-left:8px;">AI Enhanced</span>
     </div>
-    <p style="color:#475569; font-size:0.9rem; margin-top:-12px; margin-bottom:20px;">
-        Upload any suspect video — our AI scans every frame for unauthorized sports media
-    </p>
+
+    <div style="background:#eef2ff; border:1px solid #c7d2fe; border-radius:8px;
+                padding:12px 16px; margin-bottom:20px; font-size:0.85rem; color:#4338ca;">
+        <i class="fas fa-circle-info"></i>
+        <strong>Enhanced Detection:</strong> Scans full frame + center content + corner watermark zones.
+        Detects violations even if the logo is cropped out or removed — matches the actual gameplay content.
+    </div>
+
     <form method="POST" enctype="multipart/form-data">
         <div style="margin-bottom:16px;">
             <label style="font-size:0.85rem; font-weight:600; color:#475569;
@@ -17,17 +22,18 @@
                 style="width:100%; padding:10px; border:2px dashed #e2e8f0;
                        border-radius:8px; font-size:0.85rem;">
             <p style="font-size:0.78rem; color:#94a3b8; margin-top:6px;">
-                Supported: MP4, AVI, MOV, MKV — Max 100MB
+                Supported: MP4, AVI, MOV, MKV · Max 100MB ·
+                Works on highlight clips, edited reels, broadcast recordings
             </p>
         </div>
         <div style="margin-bottom:20px;">
             <label style="font-size:0.85rem; font-weight:600; color:#475569;
-                          display:block; margin-bottom:6px;">Scan interval (seconds)</label>
+                          display:block; margin-bottom:6px;">Scan Sensitivity</label>
             <select name="interval" style="padding:10px; border:1px solid #e2e8f0;
-                    border-radius:8px; font-size:0.9rem; width:200px;">
-                <option value="1">Every 1 second (thorough)</option>
-                <option value="2" selected>Every 2 seconds (recommended)</option>
-                <option value="5">Every 5 seconds (fast)</option>
+                    border-radius:8px; font-size:0.9rem; width:240px;">
+                <option value="1">Every 1 second — Maximum (catches quick cuts)</option>
+                <option value="2" selected>Every 2 seconds — Recommended</option>
+                <option value="5">Every 5 seconds — Fast preview</option>
             </select>
         </div>
         <button type="submit" class="btn btn-primary" style="width:100%;">
@@ -40,19 +46,27 @@
 <div class="card" style="text-align:center; padding:40px;">
     <i class="fas fa-spinner fa-spin" style="font-size:2rem; color:#4f46e5; margin-bottom:16px; display:block;"></i>
     <div style="font-weight:700; font-size:1.1rem;">Scanning video frames...</div>
-    <div style="color:#475569; margin-top:8px;">This may take a few minutes depending on video length</div>
+    <div style="color:#475569; margin-top:8px;">
+        Extracting frames + checking 5 regions per frame (full, center, corners, scoreboard)
+    </div>
 </div>
 {% endif %}
 
 {% if video_info %}
 <div class="card">
     <div class="card-title"><i class="fas fa-info-circle" style="color:#4f46e5"></i> Video Analysis</div>
-    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px;">
         <div style="background:#f8fafc; padding:16px; border-radius:8px; text-align:center;">
             <div style="font-size:1.5rem; font-weight:800; color:#4f46e5;">
                 {{ video_info.frames_scanned }}
             </div>
             <div style="font-size:0.85rem; color:#475569;">Frames Scanned</div>
+        </div>
+        <div style="background:#f8fafc; padding:16px; border-radius:8px; text-align:center;">
+            <div style="font-size:1.5rem; font-weight:800; color:#8b5cf6;">
+                {{ video_info.frames_scanned * 5 }}
+            </div>
+            <div style="font-size:0.85rem; color:#475569;">Regions Checked</div>
         </div>
         <div style="background:#f8fafc; padding:16px; border-radius:8px; text-align:center;">
             <div style="font-size:1.5rem; font-weight:800; color:#e11d48;">
@@ -76,24 +90,56 @@
         <i class="fas fa-triangle-exclamation" style="color:#e11d48"></i>
         Violations Found in Video
     </div>
+
+    <!-- Region explanation -->
+    <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px;
+                padding:12px 16px; margin-bottom:16px; font-size:0.82rem; color:#92400e;">
+        <strong>Matched Region Key:</strong>
+        <span style="margin-left:8px;">🖥 full = entire frame</span>
+        <span style="margin-left:8px;">🎯 center = gameplay content (no borders)</span>
+        <span style="margin-left:8px;">↖ top_left / ↗ top_right = watermark zones</span>
+        <span style="margin-left:8px;">📊 bottom_score = scorecard area</span>
+    </div>
+
     {% for v in violations %}
-    <div style="display:flex; align-items:center; gap:16px; padding:16px;
+    <div style="display:flex; align-items:flex-start; gap:16px; padding:16px;
                 border-radius:10px; margin-bottom:12px;
                 background:#fff1f2; border:1px solid #fecdd3;">
         <img src="/uploads/video_frames/{{ v.frame_filename }}"
-            style="width:120px; height:68px; object-fit:cover;
-                   border-radius:8px; border:2px solid #fecdd3;">
+            style="width:140px; height:79px; object-fit:cover;
+                   border-radius:8px; border:2px solid #fecdd3; flex-shrink:0;">
         <div style="flex:1;">
-            <div style="font-weight:700; margin-bottom:4px;">{{ v.asset_name }}</div>
-            <div style="font-size:0.85rem; color:#475569;">
-                <i class="fas fa-clock"></i> Found at timestamp:
+            <div style="font-weight:700; margin-bottom:4px; color:#0f172a;">
+                {{ v.asset_name }}
+            </div>
+            <div style="font-size:0.85rem; color:#475569; margin-bottom:4px;">
+                <i class="fas fa-clock"></i> Timestamp:
                 <strong style="color:#e11d48;">{{ v.time_str }}</strong>
+                {% if v.get('is_scene_change') %}
+                <span style="margin-left:8px; background:#fef9c3; color:#b45309;
+                             padding:2px 8px; border-radius:999px; font-size:0.72rem; font-weight:700;">
+                    ✂ Scene Cut
+                </span>
+                {% endif %}
             </div>
-            <div style="font-size:0.85rem; color:#475569; margin-top:4px;">
-                Similarity: <strong>{{ v.similarity }}%</strong>
+            <div style="font-size:0.85rem; color:#475569; margin-bottom:4px;">
+                Similarity: <strong style="color:#e11d48;">{{ v.similarity }}%</strong>
+                <span style="margin-left:8px; background:#f1f5f9; color:#475569;
+                             padding:2px 8px; border-radius:999px; font-size:0.75rem; font-weight:600;">
+                    Matched: {{ v.get('matched_region', 'full') }}
+                </span>
             </div>
+            {% if v.get('matched_region') == 'center' %}
+            <div style="font-size:0.78rem; color:#7c3aed; font-weight:600; margin-top:4px;">
+                ⚠ Content match — violation detected even without logo
+            </div>
+            {% elif v.get('matched_region') in ['top_left', 'top_right'] %}
+            <div style="font-size:0.78rem; color:#0ea5e9; font-weight:600; margin-top:4px;">
+                🔍 Watermark zone match — broadcaster logo detected
+            </div>
+            {% endif %}
         </div>
-        <span class="badge badge-alert" style="font-size:0.9rem; padding:8px 16px;">
+        <span class="badge badge-alert" style="font-size:0.88rem; padding:7px 14px; flex-shrink:0;">
             VIOLATION
         </span>
     </div>
@@ -104,7 +150,9 @@
 <div class="card" style="text-align:center; padding:40px; color:#10b981;">
     <i class="fas fa-shield-check" style="font-size:2rem; margin-bottom:12px; display:block;"></i>
     <div style="font-weight:700; font-size:1.1rem;">No violations detected!</div>
-    <div style="color:#475569; margin-top:8px;">This video appears to be clean.</div>
+    <div style="color:#475569; margin-top:8px;">
+        {{ video_info.frames_scanned * 5 }} regions checked — this video appears to be clean.
+    </div>
 </div>
 {% endif %}
 

@@ -1,0 +1,364 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card" style="border-top:4px solid #4f46e5; margin-bottom:24px;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+            <div class="card-title">
+                <i class="fas fa-share-nodes" style="color:#4f46e5"></i>
+                Social Media Monitor
+                <span class="badge badge-info" style="margin-left:8px;">Auto-Register ON</span>
+            </div>
+            <p style="color:#475569; font-size:0.9rem; margin-top:-12px;">
+                Org posts → Auto-registered as assets. Others → Scanned for violations.
+            </p>
+        </div>
+        <button onclick="runSocialScan()" id="scan-btn" class="btn btn-primary">
+            <i class="fas fa-satellite-dish"></i> Scan All Platforms
+        </button>
+    </div>
+    <div id="scan-status" style="display:none; margin-top:16px; padding:14px;
+         background:#f0fdf4; border-radius:8px; border:1px solid #bbf7d0;">
+        <i class="fas fa-spinner fa-spin" style="color:#10b981;"></i>
+        <span style="font-weight:600; color:#166534; margin-left:8px;">
+            Scanning social media platforms and auto-registering org content...
+        </span>
+    </div>
+    <div id="scan-result" style="display:none; margin-top:16px;"></div>
+</div>
+
+<!-- Stats -->
+<div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr 1fr; gap:12px; margin-bottom:24px;">
+    <div class="card" style="text-align:center; padding:16px;">
+        <div style="font-size:1.8rem; font-weight:800; color:#4f46e5;">{{ stats.total_posts }}</div>
+        <div style="color:#475569; font-size:0.8rem;">Posts Scanned</div>
+    </div>
+    <div class="card" style="text-align:center; padding:16px; border-top:3px solid #10b981;">
+        <div style="font-size:1.8rem; font-weight:800; color:#10b981;">{{ stats.registered }}</div>
+        <div style="color:#475569; font-size:0.8rem;">Auto-Registered</div>
+    </div>
+    <div class="card" style="text-align:center; padding:16px; border-top:3px solid #e11d48;">
+        <div style="font-size:1.8rem; font-weight:800; color:#e11d48;">{{ stats.violations }}</div>
+        <div style="color:#475569; font-size:0.8rem;">Violations Found</div>
+    </div>
+    <div class="card" style="text-align:center; padding:16px;">
+        <div style="font-size:1.8rem; font-weight:800; color:#ff0000;">{{ stats.youtube }}</div>
+        <div style="color:#475569; font-size:0.8rem;">
+            <i class="fab fa-youtube" style="color:#ff0000;"></i> YouTube
+        </div>
+    </div>
+    <div class="card" style="text-align:center; padding:16px;">
+        <div style="font-size:1.8rem; font-weight:800; color:#e1306c;">{{ stats.instagram }}</div>
+        <div style="color:#475569; font-size:0.8rem;">
+            <i class="fab fa-instagram" style="color:#e1306c;"></i> Instagram
+        </div>
+    </div>
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:24px;">
+
+    <!-- Monitored Accounts -->
+    <div class="card">
+        <div class="card-title">
+            <i class="fas fa-eye" style="color:#4f46e5"></i> Monitored Accounts
+        </div>
+
+        <!-- Info box -->
+        <div style="background:#eef2ff; padding:12px; border-radius:8px;
+                    margin-bottom:16px; font-size:0.82rem; color:#4f46e5;">
+            <strong>ORG OWNED</strong> = Their posts auto-register as protected assets<br>
+            <strong>MONITOR</strong> = Their posts are scanned for violations<br>
+            <strong>SUSPECT</strong> = High priority violation scanning
+        </div>
+
+        <form method="POST" action="/social/monitor/add"
+              style="background:#f8fafc; padding:16px; border-radius:8px;
+                     margin-bottom:16px; border:1px solid #e2e8f0;">
+            <div style="font-weight:600; margin-bottom:12px; font-size:0.9rem;">
+                Add Account
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
+                <select name="platform" required
+                    style="padding:8px; border:1px solid #e2e8f0; border-radius:6px; font-size:0.85rem;">
+                    <option value="">Platform</option>
+                    <option value="youtube">YouTube</option>
+                    <option value="instagram">Instagram</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="twitter">Twitter/X</option>
+                </select>
+                <select name="account_type"
+                    style="padding:8px; border:1px solid #e2e8f0; border-radius:6px; font-size:0.85rem;">
+                    <option value="ORG_OWNED">ORG OWNED (Auto-Register)</option>
+                    <option value="MONITOR">Monitor for Violations</option>
+                    <option value="SUSPECT">Suspect Account</option>
+                </select>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
+                <input type="text" name="account_id"
+                    placeholder="Channel ID / Username" required
+                    style="padding:8px; border:1px solid #e2e8f0; border-radius:6px; font-size:0.85rem;">
+                <input type="text" name="account_name"
+                    placeholder="Display Name (e.g. BCCI)" required
+                    style="padding:8px; border:1px solid #e2e8f0; border-radius:6px; font-size:0.85rem;">
+            </div>
+            <button type="submit" class="btn btn-primary"
+                style="width:100%; font-size:0.85rem; padding:8px;">
+                <i class="fas fa-plus"></i> Add Account
+            </button>
+        </form>
+
+        {% if monitored %}
+        <div style="max-height:320px; overflow-y:auto;">
+            {% for acc in monitored %}
+            <div style="display:flex; align-items:center; justify-content:space-between;
+                        padding:10px 12px; border-radius:8px; margin-bottom:8px;
+                        background:{% if acc['account_type'] == 'ORG_OWNED' %}#f0fdf4
+                                   {% elif acc['account_type'] == 'SUSPECT' %}#fff1f2
+                                   {% else %}#f8fafc{% endif %};
+                        border:1px solid {% if acc['account_type'] == 'ORG_OWNED' %}#bbf7d0
+                                         {% elif acc['account_type'] == 'SUSPECT' %}#fecdd3
+                                         {% else %}#e2e8f0{% endif %};">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <i class="fab fa-{{ acc['platform'] }}"
+                       style="font-size:1.3rem; color:
+                       {% if acc['platform'] == 'youtube' %}#ff0000
+                       {% elif acc['platform'] == 'instagram' %}#e1306c
+                       {% elif acc['platform'] == 'facebook' %}#1877f2
+                       {% else %}#1da1f2{% endif %};"></i>
+                    <div>
+                        <div style="font-weight:700; font-size:0.85rem;">
+                            {{ acc['account_name'] }}
+                            {% if acc['account_type'] == 'ORG_OWNED' %}
+                            <span style="background:#10b981; color:white; padding:2px 6px;
+                                         border-radius:4px; font-size:0.7rem; margin-left:4px;">
+                                AUTO-REGISTER
+                            </span>
+                            {% endif %}
+                        </div>
+                        <div style="font-size:0.75rem; color:#475569;">
+                            @{{ acc['account_id'] }}
+                        </div>
+                    </div>
+                </div>
+                <form method="POST" action="/social/monitor/delete/{{ acc['id'] }}">
+                    <button type="submit" class="btn btn-danger"
+                        style="padding:4px 8px; font-size:0.75rem;"
+                        onclick="return confirm('Remove?')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align:center; padding:24px; color:#94a3b8; font-size:0.9rem;">
+            No accounts added yet.<br>
+            Add your org's YouTube/Instagram with <strong>ORG OWNED</strong>
+            to auto-register their posts.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Exception Accounts -->
+    <div class="card">
+        <div class="card-title">
+            <i class="fas fa-shield-check" style="color:#10b981"></i>
+            Exception Accounts
+            <span class="badge badge-safe" style="margin-left:8px;">
+                {{ exceptions|length }}
+            </span>
+        </div>
+        <p style="color:#475569; font-size:0.85rem; margin-bottom:16px;">
+            These accounts will <strong>NEVER</strong> get copyright claims —
+            even if they post official content. Add athletes, team players, official accounts.
+        </p>
+
+        <form method="POST" action="/social/exceptions/add"
+              style="background:#f8fafc; padding:16px; border-radius:8px;
+                     margin-bottom:16px; border:1px solid #e2e8f0;">
+            <div style="font-weight:600; margin-bottom:12px; font-size:0.9rem;">
+                Add Exception
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
+                <select name="platform" required
+                    style="padding:8px; border:1px solid #e2e8f0; border-radius:6px; font-size:0.85rem;">
+                    <option value="">Platform</option>
+                    <option value="all">All Platforms</option>
+                    <option value="instagram">Instagram</option>
+                    <option value="youtube">YouTube</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="twitter">Twitter/X</option>
+                </select>
+                <input type="text" name="account_id"
+                    placeholder="Username (e.g. virat.kohli)" required
+                    style="padding:8px; border:1px solid #e2e8f0; border-radius:6px; font-size:0.85rem;">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
+                <input type="text" name="account_name"
+                    placeholder="Real name (e.g. Virat Kohli)" required
+                    style="padding:8px; border:1px solid #e2e8f0; border-radius:6px; font-size:0.85rem;">
+                <input type="text" name="reason"
+                    placeholder="Reason (e.g. Team India player)"
+                    style="padding:8px; border:1px solid #e2e8f0; border-radius:6px; font-size:0.85rem;">
+            </div>
+            <button type="submit" class="btn btn-primary"
+                style="width:100%; font-size:0.85rem; padding:8px; background:#10b981;">
+                <i class="fas fa-shield-check"></i> Add Exception
+            </button>
+        </form>
+
+        {% if exceptions %}
+        <div style="max-height:320px; overflow-y:auto;">
+            {% for exc in exceptions %}
+            <div style="display:flex; align-items:center; justify-content:space-between;
+                        padding:10px 12px; border-radius:8px; margin-bottom:8px;
+                        background:#f0fdf4; border:1px solid #bbf7d0;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <i class="fas fa-shield-check" style="color:#10b981;"></i>
+                    <div>
+                        <div style="font-weight:700; font-size:0.85rem;">
+                            {{ exc['account_name'] }}
+                        </div>
+                        <div style="font-size:0.75rem; color:#475569;">
+                            @{{ exc['account_id'] }} •
+                            {{ exc['platform']|upper }} •
+                            {{ exc['reason'] }}
+                        </div>
+                    </div>
+                </div>
+                <form method="POST" action="/social/exceptions/delete/{{ exc['id'] }}">
+                    <button type="submit" class="btn btn-danger"
+                        style="padding:4px 8px; font-size:0.75rem;"
+                        onclick="return confirm('Remove exception?')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align:center; padding:24px; color:#94a3b8; font-size:0.9rem;">
+            No exceptions yet.<br>
+            Add athletes like Virat Kohli, Rohit Sharma etc. so they never get flagged.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Social Posts Results -->
+{% if posts %}
+<div class="card">
+    <div class="card-title">
+        <i class="fas fa-list" style="color:#4f46e5"></i>
+        Social Media Activity Log
+    </div>
+    {% for post in posts %}
+    <div style="display:flex; align-items:center; justify-content:space-between;
+                padding:14px; border-radius:10px; margin-bottom:10px;
+                background:{% if post['violation_found'] %}#fff1f2{% else %}#f8fafc{% endif %};
+                border:1px solid {% if post['violation_found'] %}#fecdd3{% else %}#e2e8f0{% endif %};">
+        <div style="display:flex; align-items:center; gap:14px;">
+            <i class="fab fa-{{ post['platform'] }}"
+               style="font-size:1.8rem; color:
+               {% if post['platform'] == 'youtube' %}#ff0000
+               {% elif post['platform'] == 'instagram' %}#e1306c
+               {% elif post['platform'] == 'facebook' %}#1877f2
+               {% else %}#1da1f2{% endif %};"></i>
+            <div>
+                <div style="font-weight:700; font-size:0.9rem;">
+                    {{ post['account_name'] }}
+                    <span style="font-size:0.75rem; color:#94a3b8; margin-left:6px;">
+                        {{ post['platform']|upper }}
+                    </span>
+                </div>
+                <div style="font-size:0.82rem; color:#475569; margin-top:2px;">
+                    {{ post['caption'][:70] if post['caption'] else 'No caption' }}
+                </div>
+                {% if post['post_url'] %}
+                <a href="{{ post['post_url'] }}" target="_blank"
+                   style="font-size:0.78rem; color:#4f46e5; text-decoration:none;">
+                    View Post →
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        <div style="text-align:right; flex-shrink:0;">
+            {% if post['violation_found'] %}
+            <span class="badge badge-alert">
+                {{ post['similarity'] }}% match
+            </span>
+            <div style="font-size:0.75rem; color:#e11d48; margin-top:4px;">
+                VIOLATION
+            </div>
+            {% else %}
+            <span class="badge badge-safe">Clean / Registered</span>
+            {% endif %}
+            <div style="font-size:0.72rem; color:#94a3b8; margin-top:2px;">
+                {{ post['detected_at'][:16] if post['detected_at'] else '' }}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card" style="text-align:center; padding:40px; color:#94a3b8;">
+    <i class="fas fa-share-nodes" style="font-size:2rem; margin-bottom:12px; display:block;"></i>
+    No social media activity yet.<br>
+    Add accounts above and click <strong>Scan All Platforms</strong> to start.
+</div>
+{% endif %}
+
+<script>
+async function runSocialScan() {
+    const btn = document.getElementById('scan-btn');
+    const status = document.getElementById('scan-status');
+    const result = document.getElementById('scan-result');
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scanning...';
+    status.style.display = 'block';
+    result.style.display = 'none';
+
+    const formData = new FormData();
+    formData.append('platform', 'all');
+
+    try {
+        const response = await fetch('/social/scan', {
+            method: 'POST', body: formData
+        });
+        const data = await response.json();
+
+        status.style.display = 'none';
+        result.style.display = 'block';
+
+        const color = data.violations_found > 0 ? '#e11d48' : '#166534';
+        const bg = data.violations_found > 0 ? '#fff1f2' : '#f0fdf4';
+        const border = data.violations_found > 0 ? '#fecdd3' : '#bbf7d0';
+        const icon = data.violations_found > 0 ? 'triangle-exclamation' : 'check-circle';
+
+        result.innerHTML = `
+            <div style="padding:16px; background:${bg}; border-radius:8px;
+                 border:1px solid ${border}; color:${color}; font-weight:600;">
+                <i class="fas fa-${icon}"></i> ${data.message}
+                <br><span style="font-size:0.85rem; font-weight:400;">
+                    Auto-registered: ${data.registered} assets |
+                    Violations: ${data.violations_found}
+                </span>
+                ${data.violations_found > 0 ?
+                    '<br><a href="/violations" style="color:#4f46e5;">View violations →</a>' : ''}
+            </div>`;
+
+        setTimeout(() => location.reload(), 3000);
+
+    } catch(e) {
+        status.style.display = 'none';
+        result.style.display = 'block';
+        result.innerHTML = `<div style="padding:14px; background:#fff1f2;
+            border-radius:8px; color:#e11d48;">Error running scan. Check console.</div>`;
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-satellite-dish"></i> Scan All Platforms';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card">
+    <div class="card-title">
+        <i class="fas fa-layer-group" style="color:#4f46e5"></i> Batch Image Scan
+        <span style="font-size:0.8rem; color:#94a3b8; font-weight:400; margin-left:8px;">
+            — Upload a ZIP of images, scan all at once
+        </span>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        <div style="margin-bottom:20px;">
+            <label style="font-size:0.85rem; font-weight:600; color:#475569;
+                           display:block; margin-bottom:6px;">
+                Upload ZIP File (jpg, png, webp inside)
+            </label>
+            <input type="file" name="zipfile" accept=".zip" required
+                style="width:100%; padding:14px; border:2px dashed #c7d2fe;
+                       border-radius:10px; font-size:0.9rem; cursor:pointer;
+                       background:#fafafe;">
+            <div style="font-size:0.78rem; color:#94a3b8; margin-top:6px;">
+                <i class="fas fa-circle-info"></i>
+                Max recommended: 50 images per batch for best speed. Each image is scanned
+                against all registered assets using 3 AI detection methods.
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-rocket"></i> Start Batch Scan
+        </button>
+    </form>
+
+    {% if error %}
+    <div style="margin-top:16px; background:#fff1f2; border:1px solid #fecdd3; border-radius:8px;
+                padding:12px 16px; color:#e11d48; font-size:0.88rem;">
+        <i class="fas fa-circle-xmark"></i> {{ error }}
+    </div>
+    {% endif %}
+</div>
+
+{% if summary %}
+<!-- Batch Summary -->
+<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px;">
+    <div class="card" style="text-align:center; padding:18px; border-top:3px solid #4f46e5;">
+        <div style="font-size:2rem; font-weight:800; color:#4f46e5;">{{ summary.total }}</div>
+        <div style="font-size:0.82rem; color:#64748b; font-weight:500;">Images Scanned</div>
+    </div>
+    <div class="card" style="text-align:center; padding:18px; border-top:3px solid #e11d48;">
+        <div style="font-size:2rem; font-weight:800; color:#e11d48;">{{ summary.violations }}</div>
+        <div style="font-size:0.82rem; color:#64748b; font-weight:500;">Violations Found</div>
+    </div>
+    <div class="card" style="text-align:center; padding:18px; border-top:3px solid #10b981;">
+        <div style="font-size:2rem; font-weight:800; color:#10b981;">{{ summary.safe }}</div>
+        <div style="font-size:0.82rem; color:#64748b; font-weight:500;">Safe Images</div>
+    </div>
+    <div class="card" style="text-align:center; padding:18px; border-top:3px solid #f97316;">
+        <div style="font-size:2rem; font-weight:800; color:#f97316;">{{ summary.violation_rate }}%</div>
+        <div style="font-size:0.82rem; color:#64748b; font-weight:500;">Violation Rate</div>
+    </div>
+</div>
+
+<!-- Export button -->
+<div style="display:flex; justify-content:flex-end; margin-bottom:12px;">
+    <a href="/batch/export/{{ summary.batch_id }}" class="btn btn-primary" style="font-size:0.85rem;">
+        <i class="fas fa-file-csv"></i> Export CSV Report (Batch #{{ summary.batch_id }})
+    </a>
+</div>
+{% endif %}
+
+{% if results %}
+<div class="card">
+    <div class="card-title">
+        <i class="fas fa-list-check" style="color:#4f46e5"></i> Results
+        <span style="margin-left:8px; font-size:0.82rem; color:#94a3b8; font-weight:400;">
+            Sorted by similarity (highest first)
+        </span>
+    </div>
+
+    <table style="width:100%; border-collapse:collapse;">
+        <thead>
+            <tr style="background:#f8fafc;">
+                <th style="padding:12px 16px; text-align:left; font-size:0.78rem; color:#475569;
+                            text-transform:uppercase; border-bottom:1px solid #e2e8f0;">File</th>
+                <th style="padding:12px 16px; text-align:left; font-size:0.78rem; color:#475569;
+                            text-transform:uppercase; border-bottom:1px solid #e2e8f0;">Matched Asset</th>
+                <th style="padding:12px 16px; text-align:left; font-size:0.78rem; color:#475569;
+                            text-transform:uppercase; border-bottom:1px solid #e2e8f0;">Confidence Breakdown</th>
+                <th style="padding:12px 16px; text-align:left; font-size:0.78rem; color:#475569;
+                            text-transform:uppercase; border-bottom:1px solid #e2e8f0;">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in results %}
+            <tr style="border-bottom:1px solid #f1f5f9;
+                       background:{{ '#fff9f9' if r.status == 'VIOLATION' else 'white' }};">
+                <td style="padding:14px 16px;">
+                    <div style="font-weight:600; color:#0f172a; font-size:0.88rem;">{{ r.filename }}</div>
+                </td>
+                <td style="padding:14px 16px;">
+                    <div style="font-size:0.88rem; color:#334155;">{{ r.asset_name }}</div>
+                    <div style="font-size:0.75rem; color:#94a3b8; margin-top:2px;">
+                        Overall: <strong>{{ r.similarity }}%</strong>
+                    </div>
+                </td>
+                <td style="padding:14px 16px;">
+                    <!-- Mini breakdown bars -->
+                    <div style="display:flex; flex-direction:column; gap:4px; min-width:180px;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-size:0.68rem; color:#6366f1; font-weight:700; width:50px;">Hash</span>
+                            <div style="flex:1; height:5px; background:#e0e7ff; border-radius:999px;">
+                                <div style="height:100%; width:{{ r.hash_score }}%; background:#6366f1; border-radius:999px;"></div>
+                            </div>
+                            <span style="font-size:0.68rem; color:#475569; width:32px;">{{ r.hash_score }}%</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-size:0.68rem; color:#0ea5e9; font-weight:700; width:50px;">OpenCV</span>
+                            <div style="flex:1; height:5px; background:#e0f2fe; border-radius:999px;">
+                                <div style="height:100%; width:{{ r.opencv_score }}%; background:#0ea5e9; border-radius:999px;"></div>
+                            </div>
+                            <span style="font-size:0.68rem; color:#475569; width:32px;">{{ r.opencv_score }}%</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-size:0.68rem; color:#10b981; font-weight:700; width:50px;">AI/DL</span>
+                            <div style="flex:1; height:5px; background:#d1fae5; border-radius:999px;">
+                                <div style="height:100%; width:{{ r.dl_score }}%; background:#10b981; border-radius:999px;"></div>
+                            </div>
+                            <span style="font-size:0.68rem; color:#475569; width:32px;">{{ r.dl_score }}%</span>
+                        </div>
+                    </div>
+                </td>
+                <td style="padding:14px 16px;">
+                    {% if r.status == 'VIOLATION' %}
+                    <span style="background:#e11d48; color:white; padding:5px 12px; border-radius:999px;
+                                 font-size:0.78rem; font-weight:700;">⚠ VIOLATION</span>
+                    {% elif r.status == 'ERROR' %}
+                    <span style="background:#f1f5f9; color:#94a3b8; padding:5px 12px; border-radius:999px;
+                                 font-size:0.78rem; font-weight:600;">ERROR</span>
+                    {% else %}
+                    <span style="background:#f0fdf4; color:#10b981; padding:5px 12px; border-radius:999px;
+                                 font-size:0.78rem; font-weight:700;">✓ SAFE</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% endblock %}

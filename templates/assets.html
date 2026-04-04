@@ -2,50 +2,102 @@
 {% block content %}
 
 <div class="card">
-    <div class="card-title"><i class="fas fa-database" style="color:#4f46e5"></i> Registered Assets</div>
+    <div class="card-title">
+        <i class="fas fa-database" style="color:#4f46e5"></i> Asset Registry
+    </div>
+
     {% if assets %}
+    <!-- License status summary -->
+    {% set expired = assets | selectattr('license_status', 'equalto', 'EXPIRED') | list %}
+    {% set expiring = assets | selectattr('license_status', 'equalto', 'EXPIRING_SOON') | list %}
+    {% if expired or expiring %}
+    <div style="margin-bottom:16px; display:flex; gap:10px; flex-wrap:wrap;">
+        {% if expired %}
+        <div style="background:#fff1f2; border:1px solid #fecdd3; border-radius:8px;
+                    padding:10px 16px; font-size:0.85rem; color:#e11d48; font-weight:600;">
+            <i class="fas fa-circle-xmark"></i> {{ expired|length }} asset(s) with EXPIRED license
+        </div>
+        {% endif %}
+        {% if expiring %}
+        <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px;
+                    padding:10px 16px; font-size:0.85rem; color:#b45309; font-weight:600;">
+            <i class="fas fa-triangle-exclamation"></i> {{ expiring|length }} asset(s) expiring within 30 days
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
     <table style="width:100%; border-collapse:collapse;">
         <thead>
             <tr style="background:#f8fafc;">
-                <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:#475569; text-transform:uppercase; border-bottom:1px solid #e2e8f0;">Asset</th>
-                <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:#475569; text-transform:uppercase; border-bottom:1px solid #e2e8f0;">Name</th>
-                <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:#475569; text-transform:uppercase; border-bottom:1px solid #e2e8f0;">Fingerprint</th>
-                <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:#475569; text-transform:uppercase; border-bottom:1px solid #e2e8f0;">Registered</th>
-                <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:#475569; text-transform:uppercase; border-bottom:1px solid #e2e8f0;">Watermark</th>
-                <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:#475569; text-transform:uppercase; border-bottom:1px solid #e2e8f0;">Action</th>
+                <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:#475569;
+                            text-transform:uppercase; border-bottom:1px solid #e2e8f0;">Asset</th>
+                <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:#475569;
+                            text-transform:uppercase; border-bottom:1px solid #e2e8f0;">Preview</th>
+                <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:#475569;
+                            text-transform:uppercase; border-bottom:1px solid #e2e8f0;">License</th>
+                <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:#475569;
+                            text-transform:uppercase; border-bottom:1px solid #e2e8f0;">Registered</th>
+                <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:#475569;
+                            text-transform:uppercase; border-bottom:1px solid #e2e8f0;">Action</th>
             </tr>
         </thead>
         <tbody>
             {% for asset in assets %}
             <tr style="border-bottom:1px solid #f1f5f9;">
                 <td style="padding:14px 16px;">
-                    <img src="/uploads/{{ asset['filename'] }}"
-                        style="width:60px; height:60px; object-fit:cover; border-radius:8px; border:1px solid #e2e8f0;">
+                    <div style="font-weight:600; color:#0f172a;">{{ asset.name }}</div>
+                    <div style="font-size:0.75rem; color:#94a3b8; margin-top:2px;">
+                        {{ asset.filename[:30] }}{% if asset.filename|length > 30 %}...{% endif %}
+                    </div>
                 </td>
-                <td style="padding:14px 16px; font-weight:600;">{{ asset['name'] }}</td>
                 <td style="padding:14px 16px;">
-                    <code style="background:#f1f5f9; padding:4px 8px; border-radius:4px; font-size:0.8rem; color:#4f46e5;">
-                        {{ asset['phash'][:16] }}...
-                    </code>
+                    <img src="/uploads/{{ asset.filename }}"
+                         style="width:48px; height:48px; object-fit:cover;
+                                border-radius:8px; border:1px solid #e2e8f0;">
                 </td>
-                <td style="padding:14px 16px; color:#475569; font-size:0.85rem;">{{ asset['uploaded_at'] }}</td>
                 <td style="padding:14px 16px;">
-                    {% if asset['watermark_file'] %}
-                    <a href="/uploads/{{ asset['watermark_file'] }}"
-                       download="{{ asset['watermark_file'] }}"
-                       class="btn btn-primary"
-                       style="padding:6px 12px; font-size:0.8rem; text-decoration:none;">
-                        <i class="fas fa-download"></i> Watermarked
-                    </a>
+                    {% if asset.license_status == 'EXPIRED' %}
+                    <span style="background:#fff1f2; color:#e11d48; padding:4px 10px;
+                                 border-radius:999px; font-size:0.75rem; font-weight:700;">
+                        <i class="fas fa-circle-xmark"></i> EXPIRED
+                    </span>
+                    {% elif asset.license_status == 'EXPIRING_SOON' %}
+                    <span style="background:#fffbeb; color:#b45309; padding:4px 10px;
+                                 border-radius:999px; font-size:0.75rem; font-weight:700;">
+                        <i class="fas fa-triangle-exclamation"></i> EXPIRING SOON
+                    </span>
+                    {% elif asset.license_status == 'ACTIVE' %}
+                    <span style="background:#f0fdf4; color:#10b981; padding:4px 10px;
+                                 border-radius:999px; font-size:0.75rem; font-weight:700;">
+                        <i class="fas fa-circle-check"></i> ACTIVE
+                    </span>
                     {% else %}
-                    <span style="color:#94a3b8; font-size:0.85rem;">No watermark</span>
+                    <span style="background:#f1f5f9; color:#94a3b8; padding:4px 10px;
+                                 border-radius:999px; font-size:0.75rem; font-weight:600;">
+                        No License
+                    </span>
+                    {% endif %}
+                    {% if asset.license_end %}
+                    <div style="font-size:0.72rem; color:#94a3b8; margin-top:4px;">
+                        Until {{ asset.license_end }}
+                    </div>
+                    {% endif %}
+                    {% if asset.license_owner %}
+                    <div style="font-size:0.72rem; color:#94a3b8;">
+                        Owner: {{ asset.license_owner }}
+                    </div>
                     {% endif %}
                 </td>
+                <td style="padding:14px 16px; color:#475569; font-size:0.85rem;">
+                    {{ asset.uploaded_at[:10] if asset.uploaded_at else 'N/A' }}
+                </td>
                 <td style="padding:14px 16px;">
-                    <form method="POST" action="/assets/delete/{{ asset['id'] }}">
-                        <button type="submit" class="btn btn-danger" style="padding:6px 12px; font-size:0.8rem;"
-                            onclick="return confirm('Delete this asset?')">
-                            <i class="fas fa-trash"></i> Delete
+                    <form method="POST" action="/assets/delete/{{ asset.id }}"
+                          onsubmit="return confirm('Delete this asset?')">
+                        <button type="submit" class="btn btn-danger"
+                                style="padding:6px 14px; font-size:0.8rem;">
+                            <i class="fas fa-trash"></i>
                         </button>
                     </form>
                 </td>
@@ -56,9 +108,60 @@
     {% else %}
     <div style="text-align:center; padding:40px; color:#94a3b8;">
         <i class="fas fa-database" style="font-size:2rem; margin-bottom:12px; display:block;"></i>
-        No assets registered yet. Go to Home to register your first asset.
+        No assets registered yet. Upload one from the Home page.
     </div>
     {% endif %}
+</div>
+
+<!-- Register New Asset with License Fields -->
+<div class="card">
+    <div class="card-title">
+        <i class="fas fa-plus-circle" style="color:#4f46e5"></i> Register New Asset
+    </div>
+    <form method="POST" action="/assets/upload" enctype="multipart/form-data">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div>
+                <label style="font-size:0.85rem; font-weight:600; color:#475569;
+                               display:block; margin-bottom:6px;">Asset Name *</label>
+                <input type="text" name="name" required placeholder="e.g. FIFA World Cup 2026 Logo"
+                    style="width:100%; padding:10px 14px; border:1px solid #e2e8f0;
+                           border-radius:8px; font-size:0.9rem; outline:none;">
+            </div>
+            <div>
+                <label style="font-size:0.85rem; font-weight:600; color:#475569;
+                               display:block; margin-bottom:6px;">Image File *</label>
+                <input type="file" name="image" accept="image/*" required
+                    style="width:100%; padding:10px; border:2px dashed #e2e8f0;
+                           border-radius:8px; font-size:0.85rem; cursor:pointer;">
+            </div>
+            <div>
+                <label style="font-size:0.85rem; font-weight:600; color:#475569;
+                               display:block; margin-bottom:6px;">License Owner (optional)</label>
+                <input type="text" name="license_owner" placeholder="e.g. FIFA, IOC, IPL"
+                    style="width:100%; padding:10px 14px; border:1px solid #e2e8f0;
+                           border-radius:8px; font-size:0.9rem; outline:none;">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div>
+                    <label style="font-size:0.85rem; font-weight:600; color:#475569;
+                                   display:block; margin-bottom:6px;">License Start</label>
+                    <input type="date" name="license_start"
+                        style="width:100%; padding:10px 14px; border:1px solid #e2e8f0;
+                               border-radius:8px; font-size:0.9rem; outline:none;">
+                </div>
+                <div>
+                    <label style="font-size:0.85rem; font-weight:600; color:#475569;
+                                   display:block; margin-bottom:6px;">License End</label>
+                    <input type="date" name="license_end"
+                        style="width:100%; padding:10px 14px; border:1px solid #e2e8f0;
+                               border-radius:8px; font-size:0.9rem; outline:none;">
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top:18px;">
+            <i class="fas fa-plus"></i> Register Asset
+        </button>
+    </form>
 </div>
 
 {% endblock %}

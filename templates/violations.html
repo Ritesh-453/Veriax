@@ -4,33 +4,161 @@
 <div class="card">
     <div class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
         <span><i class="fas fa-triangle-exclamation" style="color:#e11d48"></i> Violations Log</span>
-        <a href="/report/export" class="btn btn-primary" style="font-size:0.85rem; padding:8px 16px;">
-            <i class="fas fa-file-pdf"></i> Export PDF Report
-        </a>
+        <div style="display:flex; gap:10px;">
+            <a href="/report/export" class="btn btn-primary" style="font-size:0.85rem; padding:8px 16px;">
+                <i class="fas fa-file-pdf"></i> Export PDF Report
+            </a>
+        </div>
     </div>
+
     {% if violations %}
-    <table style="width:100%; border-collapse:collapse;">
-        <thead>
-            <tr style="background:#f8fafc;">
-                <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:#475569; text-transform:uppercase; border-bottom:1px solid #e2e8f0;">Asset</th>
-                <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:#475569; text-transform:uppercase; border-bottom:1px solid #e2e8f0;">Similarity</th>
-                <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:#475569; border-bottom:1px solid #e2e8f0; text-transform:uppercase;">Detected</th>
-            </tr>
-        </thead>
-        <tbody>
+
+    <!-- Takedown Status Legend -->
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
+        <div style="font-size:0.78rem; font-weight:700; color:#475569; align-self:center;">
+            Takedown Status:
+        </div>
+        <span style="background:#f1f5f9; color:#64748b; padding:4px 12px;
+                     border-radius:999px; font-size:0.75rem; font-weight:600;">
+            ● Pending Action
+        </span>
+        <span style="background:#fffbeb; color:#b45309; padding:4px 12px;
+                     border-radius:999px; font-size:0.75rem; font-weight:600;">
+            ● Notice Sent
+        </span>
+        <span style="background:#f0fdf4; color:#10b981; padding:4px 12px;
+                     border-radius:999px; font-size:0.75rem; font-weight:600;">
+            ● Resolved
+        </span>
+        <span style="background:#fff1f2; color:#e11d48; padding:4px 12px;
+                     border-radius:999px; font-size:0.75rem; font-weight:600;">
+            ● Rejected
+        </span>
+    </div>
+
+    <!-- Timeline View -->
+    <div style="margin-bottom:28px;">
+        <div style="font-size:0.85rem; font-weight:700; color:#475569; text-transform:uppercase;
+                    letter-spacing:0.05em; margin-bottom:16px;">
+            <i class="fas fa-timeline" style="color:#4f46e5"></i> Violation Timeline
+        </div>
+
+        <div style="position:relative; padding-left:28px;">
+            <div style="position:absolute; left:8px; top:0; bottom:0; width:2px;
+                        background: linear-gradient(to bottom, #4f46e5, #e11d48);
+                        border-radius:2px;"></div>
+
             {% for v in violations %}
-            <tr style="border-bottom:1px solid #f1f5f9;">
-                <td style="padding:14px 16px;">
-                    <div style="font-weight:600;">{{ v['asset_name'] }}</div>
-                </td>
-                <td style="padding:14px 16px;">
-                    <span class="badge badge-alert">{{ v['similarity'] }}% match</span>
-                </td>
-                <td style="padding:14px 16px; color:#475569; font-size:0.85rem;">{{ v['detected_at'] }}</td>
-            </tr>
+            <div style="position:relative; margin-bottom:20px;" id="violation-{{ v['id'] }}">
+                <div style="position:absolute; left:-24px; top:14px; width:12px; height:12px;
+                            border-radius:50%; border:2px solid white;
+                            background: {{ '#e11d48' if v['similarity'] >= 90 else '#f97316' if v['similarity'] >= 70 else '#f59e0b' }};
+                            box-shadow:0 0 0 3px {{ 'rgba(225,29,72,0.2)' if v['similarity'] >= 90 else 'rgba(249,115,22,0.2)' }};
+                            z-index:1;"></div>
+
+                <div style="background:white; border:1px solid #e2e8f0; border-radius:10px;
+                            padding:16px 20px; box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+
+                    <!-- Top row -->
+                    <div style="display:flex; align-items:flex-start; justify-content:space-between;
+                                flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+                        <div style="flex:1; min-width:200px;">
+                            <div style="font-weight:700; color:#0f172a; margin-bottom:4px;">
+                                {{ v['asset_name'] }}
+                            </div>
+                            <div style="font-size:0.8rem; color:#94a3b8;">
+                                <i class="fas fa-clock"></i>
+                                {{ v['detected_at'][:16] if v['detected_at'] else 'N/A' }}
+                            </div>
+                        </div>
+
+                        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                            <span style="background:{{ '#fff1f2' if v['similarity'] >= 70 else '#fef9c3' }};
+                                         color:{{ '#e11d48' if v['similarity'] >= 70 else '#854d0e' }};
+                                         padding:5px 14px; border-radius:999px;
+                                         font-size:0.82rem; font-weight:700;">
+                                {{ v['similarity'] }}% match
+                            </span>
+
+                            {% if v['similarity'] >= 90 %}
+                            <span class="badge" style="background:#e11d48; color:white;">CRITICAL</span>
+                            {% elif v['similarity'] >= 70 %}
+                            <span class="badge" style="background:#f97316; color:white;">HIGH</span>
+                            {% elif v['similarity'] >= 50 %}
+                            <span class="badge" style="background:#f59e0b; color:white;">MEDIUM</span>
+                            {% else %}
+                            <span class="badge" style="background:#10b981; color:white;">LOW</span>
+                            {% endif %}
+
+                            <div style="display:flex; align-items:center; gap:6px; min-width:120px;">
+                                <div style="flex:1; height:6px; background:#f1f5f9; border-radius:999px; overflow:hidden;">
+                                    <div style="height:100%; width:{{ v['similarity'] }}%;
+                                                background: {{ '#e11d48' if v['similarity'] >= 90 else '#f97316' if v['similarity'] >= 70 else '#f59e0b' }};
+                                                border-radius:999px;"></div>
+                                </div>
+                            </div>
+
+                            <a href="/report/dmca/{{ v['id'] }}"
+                               style="background:#4f46e5; color:white; padding:7px 14px; border-radius:7px;
+                                      font-size:0.8rem; font-weight:600; text-decoration:none;
+                                      display:inline-flex; align-items:center; gap:6px; white-space:nowrap;">
+                                <i class="fas fa-gavel"></i> DMCA Notice
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- ✅ Takedown Status Tracker -->
+                    <div style="background:#f8fafc; border-radius:8px; padding:12px 14px;
+                                border:1px solid #e2e8f0;">
+                        <div style="font-size:0.75rem; font-weight:700; color:#475569;
+                                    text-transform:uppercase; margin-bottom:10px;">
+                            <i class="fas fa-list-check"></i> Takedown Status
+                        </div>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+
+                            <!-- Status buttons -->
+                            <button onclick="setStatus({{ v['id'] }}, 'pending')"
+                                    class="status-btn" id="btn-pending-{{ v['id'] }}"
+                                    style="padding:6px 14px; border-radius:999px; border:none; cursor:pointer;
+                                           font-size:0.75rem; font-weight:700; transition:all 0.2s;
+                                           background:#f1f5f9; color:#64748b;">
+                                ● Pending
+                            </button>
+                            <button onclick="setStatus({{ v['id'] }}, 'sent')"
+                                    class="status-btn" id="btn-sent-{{ v['id'] }}"
+                                    style="padding:6px 14px; border-radius:999px; border:none; cursor:pointer;
+                                           font-size:0.75rem; font-weight:700; transition:all 0.2s;
+                                           background:#f1f5f9; color:#64748b;">
+                                ✉ Notice Sent
+                            </button>
+                            <button onclick="setStatus({{ v['id'] }}, 'resolved')"
+                                    class="status-btn" id="btn-resolved-{{ v['id'] }}"
+                                    style="padding:6px 14px; border-radius:999px; border:none; cursor:pointer;
+                                           font-size:0.75rem; font-weight:700; transition:all 0.2s;
+                                           background:#f1f5f9; color:#64748b;">
+                                ✓ Resolved
+                            </button>
+                            <button onclick="setStatus({{ v['id'] }}, 'rejected')"
+                                    class="status-btn" id="btn-rejected-{{ v['id'] }}"
+                                    style="padding:6px 14px; border-radius:999px; border:none; cursor:pointer;
+                                           font-size:0.75rem; font-weight:700; transition:all 0.2s;
+                                           background:#f1f5f9; color:#64748b;">
+                                ✕ Rejected
+                            </button>
+
+                            <!-- Current status display -->
+                            <span id="status-label-{{ v['id'] }}"
+                                  style="margin-left:auto; font-size:0.78rem; color:#94a3b8; font-style:italic;">
+                                Click to update status
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {% endfor %}
-        </tbody>
-    </table>
+        </div>
+    </div>
+
     {% else %}
     <div style="text-align:center; padding:40px; color:#94a3b8;">
         <i class="fas fa-shield-check" style="font-size:2rem; margin-bottom:12px; display:block;"></i>
@@ -38,5 +166,60 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+// Status colors
+const statusStyles = {
+    pending:  { bg: '#f1f5f9', color: '#64748b', label: '● Pending Action' },
+    sent:     { bg: '#fffbeb', color: '#b45309', label: '✉ Notice Sent' },
+    resolved: { bg: '#f0fdf4', color: '#10b981', label: '✓ Resolved' },
+    rejected: { bg: '#fff1f2', color: '#e11d48', label: '✕ Rejected' }
+};
+
+// Load saved statuses from localStorage on page load
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[id^="status-label-"]').forEach(el => {
+        const vid = el.id.replace('status-label-', '');
+        const saved = localStorage.getItem('takedown_' + vid);
+        if (saved) applyStatus(vid, saved);
+    });
+});
+
+function setStatus(violationId, status) {
+    localStorage.setItem('takedown_' + violationId, status);
+    applyStatus(violationId, status);
+}
+
+function applyStatus(vid, status) {
+    const s = statusStyles[status];
+    if (!s) return;
+
+    // Reset all buttons for this violation
+    ['pending','sent','resolved','rejected'].forEach(st => {
+        const btn = document.getElementById('btn-' + st + '-' + vid);
+        if (btn) {
+            btn.style.background = '#f1f5f9';
+            btn.style.color = '#94a3b8';
+        }
+    });
+
+    // Highlight active button
+    const activeBtn = document.getElementById('btn-' + status + '-' + vid);
+    if (activeBtn) {
+        activeBtn.style.background = s.bg;
+        activeBtn.style.color = s.color;
+        activeBtn.style.fontWeight = '800';
+    }
+
+    // Update label
+    const label = document.getElementById('status-label-' + vid);
+    if (label) {
+        label.textContent = s.label;
+        label.style.color = s.color;
+        label.style.fontStyle = 'normal';
+        label.style.fontWeight = '600';
+    }
+}
+</script>
 
 {% endblock %}

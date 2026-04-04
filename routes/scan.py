@@ -63,12 +63,8 @@ def get_risk_label(similarity):
         return 'MEDIUM', '#f59e0b'
     else:
         return 'LOW', '#10b981'
-    
+
 def combined_similarity(hash_score, opencv_score, dl_score):
-    """
-    Intelligently combine Hash + OpenCV + Deep Learning scores
-    Each method catches different types of violations
-    """
     active_methods = sum([
         1 if hash_score > 0 else 0,
         1 if opencv_score > 0 else 0,
@@ -76,7 +72,6 @@ def combined_similarity(hash_score, opencv_score, dl_score):
     ])
 
     if active_methods == 3:
-        # All methods working — weighted combination
         final = (hash_score * 0.2) + (opencv_score * 0.3) + (dl_score * 0.5)
     elif active_methods == 2:
         if dl_score > 0 and opencv_score > 0:
@@ -90,12 +85,14 @@ def combined_similarity(hash_score, opencv_score, dl_score):
 
     return round(final, 2)
 
+
 @scan_bp.route('/scan', methods=['GET', 'POST'])
 def scan():
     results = []
     exif_data = {}
     scan_filename = None
     ai_analysis = None
+    watermark_result = None
 
     if request.method == 'POST':
         if 'image' not in request.files:
@@ -109,13 +106,9 @@ def scan():
         filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], scan_filename)
         file.save(filepath)
 
-        # Get hashes
         scan_hashes = get_all_hashes(filepath)
         exif_data = get_exif_data(filepath)
-
-        # Gemini AI analysis of scanned image
         ai_analysis = analyze_image(filepath)
-        # Check for watermark
         watermark_result = check_watermark(filepath)
 
         if not scan_hashes:
@@ -152,10 +145,7 @@ def scan():
             similarity = combined_similarity(hash_score, opencv_score, dl_score)
             risk_label, risk_color = get_risk_label(similarity)
 
-            # For high matches — get AI comparison too
-            ai_verdict = None
-
-                    # Auto-save violations above 70%
+            # Auto-save violations above 70%
             if similarity > 70:
                 db.execute(
                     'INSERT INTO violations (asset_id, similarity) VALUES (?, ?)',
@@ -177,13 +167,14 @@ def scan():
                     asset['name'],
                     similarity,
                     ['pHash', 'dHash', 'aHash', 'SIFT', 'ORB', 'MobileNet'],
-                    scan_type='IMAGE'   
+                    scan_type='IMAGE'
                 )
 
-                # Send email alert
+                # Send email + WhatsApp alert
                 from routes.alerts import send_violation_alert
                 send_violation_alert(asset['name'], similarity)
 
+            # ✅ FIXED: Only ONE append per asset (was appending twice before)
             results.append({
                 'asset_name': asset['name'],
                 'filename': asset['filename'],
@@ -194,17 +185,7 @@ def scan():
                 'status': 'ALERT' if similarity > 70 else 'SAFE',
                 'risk_label': risk_label,
                 'risk_color': risk_color,
-                'ai_verdict': ai_verdict
-            })
-            
-            results.append({
-                'asset_name': asset['name'],
-                'filename': asset['filename'],
-                'similarity': similarity,
-                'status': 'ALERT' if similarity > 70 else 'SAFE',
-                'risk_label': risk_label,
-                'risk_color': risk_color,
-                'ai_verdict': ai_verdict
+                'ai_verdict': None
             })
 
         db.close()
@@ -214,7 +195,8 @@ def scan():
                            exif_data=exif_data,
                            scan_filename=scan_filename,
                            ai_analysis=ai_analysis,
-                           watermark_result=watermark_result if request.method == 'POST' else None)
+                           watermark_result=watermark_result)
+
 
 @scan_bp.route('/violations')
 def violations():

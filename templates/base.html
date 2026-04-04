@@ -12,27 +12,37 @@
 
         nav {
             background: white;
-            padding: 1rem 5%;
+            padding: 0.8rem 4%;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #e2e8f0;
             position: sticky; top: 0; z-index: 100;
+            flex-wrap: wrap;
+            gap: 8px;
         }
-        .logo { font-weight: 700; font-size: 1.2rem; color: #4f46e5; display: flex; align-items: center; gap: 8px; }
-        .nav-links { display: flex; gap: 8px; }
+        .logo { font-weight: 700; font-size: 1.15rem; color: #4f46e5;
+                display: flex; align-items: center; gap: 8px; }
+        .nav-links { display: flex; gap: 2px; flex-wrap: wrap; }
         .nav-links a {
             text-decoration: none; color: #475569;
-            padding: 8px 16px; border-radius: 8px;
-            font-size: 0.9rem; font-weight: 500;
+            padding: 6px 10px; border-radius: 7px;
+            font-size: 0.82rem; font-weight: 500;
             transition: all 0.2s;
+            display: flex; align-items: center; gap: 5px;
         }
         .nav-links a:hover { background: #f1f5f9; color: #4f46e5; }
         .nav-links a.active { background: #eef2ff; color: #4f46e5; }
+        .nav-links a.demo-link {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white !important;
+            font-weight: 700;
+        }
+        .nav-links a.demo-link:hover { opacity: 0.9; }
 
-        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+        .container { max-width: 1200px; margin: 32px auto; padding: 0 20px; }
 
-        .flash-messages { max-width: 1100px; margin: 20px auto 0; padding: 0 20px; }
+        .flash-messages { max-width: 1200px; margin: 16px auto 0; padding: 0 20px; }
         .flash {
             padding: 12px 20px; border-radius: 8px; margin-bottom: 10px;
             background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;
@@ -42,23 +52,25 @@
         .card {
             background: white; border-radius: 12px;
             border: 1px solid #e2e8f0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-            padding: 28px; margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+            padding: 24px; margin-bottom: 20px;
         }
         .card-title {
-            font-size: 1.1rem; font-weight: 700;
-            margin-bottom: 20px; color: #0f172a;
+            font-size: 1rem; font-weight: 700;
+            margin-bottom: 18px; color: #0f172a;
             display: flex; align-items: center; gap: 8px;
         }
 
         .btn {
             padding: 10px 20px; border-radius: 8px; border: none;
             font-weight: 600; font-size: 0.9rem; cursor: pointer;
-            transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+            transition: all 0.2s; display: inline-flex; align-items: center;
+            gap: 8px; text-decoration: none;
         }
         .btn-primary { background: #4f46e5; color: white; }
         .btn-primary:hover { background: #4338ca; }
         .btn-danger { background: #e11d48; color: white; }
+        .btn-danger:hover { background: #be123c; }
 
         .badge {
             padding: 4px 10px; border-radius: 999px;
@@ -67,6 +79,14 @@
         .badge-alert { background: #fff1f2; color: #e11d48; }
         .badge-safe { background: #f0fdf4; color: #10b981; }
         .badge-info { background: #eef2ff; color: #4f46e5; }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .nav-links { gap: 2px; }
+            .nav-links a { padding: 5px 8px; font-size: 0.75rem; }
+            .container { margin: 16px auto; }
+            .card { padding: 16px; }
+        }
     </style>
 </head>
 <body>
@@ -82,23 +102,32 @@
         <a href="/scan" class="{{ 'active' if request.endpoint == 'scan.scan' }}">
             <i class="fas fa-magnifying-glass"></i> Scan
         </a>
+        <a href="/batch" class="{{ 'active' if request.endpoint == 'batch.batch_scan' }}">
+            <i class="fas fa-layer-group"></i> Batch
+        </a>
         <a href="/violations" class="{{ 'active' if request.endpoint == 'scan.violations' }}">
             <i class="fas fa-triangle-exclamation"></i> Violations
-        </a>
-        <a href="/sdg" class="{{ 'active' if request.endpoint == 'sdg' }}">
-            <i class="fas fa-earth-asia"></i> SDG Goals
-        </a>
-        <a href="/scanner" class="{{ 'active' if request.endpoint == 'scanner.scanner_dashboard' }}">
-            <i class="fas fa-satellite-dish"></i> Scanner
         </a>
         <a href="/video" class="{{ 'active' if request.endpoint == 'video_scan' }}">
             <i class="fas fa-film"></i> Video
         </a>
-        <a href="/api-docs" class="{{ 'active' if request.endpoint == 'api_docs' }}">
-            <i class="fas fa-code"></i> API
+        <a href="/scanner" class="{{ 'active' if request.endpoint == 'scanner.scanner_dashboard' }}">
+            <i class="fas fa-satellite-dish"></i> Scanner
         </a>
         <a href="/blockchain" class="{{ 'active' if request.endpoint == 'blockchain' }}">
             <i class="fas fa-link"></i> Blockchain
+        </a>
+        <a href="/social" class="{{ 'active' if request.endpoint == 'social.social_dashboard' }}">
+            <i class="fas fa-share-nodes"></i> Social
+        </a>
+        <a href="/sdg" class="{{ 'active' if request.endpoint == 'sdg' }}">
+            <i class="fas fa-earth-asia"></i> SDG
+        </a>
+        <a href="/api-docs" class="{{ 'active' if request.endpoint == 'api_docs' }}">
+            <i class="fas fa-code"></i> API
+        </a>
+        <a href="/demo" class="demo-link {{ 'active' if request.endpoint == 'demo.demo_page' }}">
+            <i class="fas fa-rocket"></i> Live Demo
         </a>
     </div>
 </nav>

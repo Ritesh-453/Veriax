@@ -24,12 +24,18 @@ from routes.scan import scan_bp
 from routes.report import report_bp
 from routes.scanner import scanner_bp, run_scheduled_scan
 from routes.api import api_bp
+from routes.social_media import social_bp
+from routes.batch_scan import batch_bp
+from routes.demo import demo_bp
 
 app.register_blueprint(assets_bp)
 app.register_blueprint(scan_bp)
 app.register_blueprint(report_bp)
 app.register_blueprint(scanner_bp)
 app.register_blueprint(api_bp)
+app.register_blueprint(social_bp)
+app.register_blueprint(batch_bp)
+app.register_blueprint(demo_bp)
 
 # Start background scanner thread
 # Background scanner disabled during development

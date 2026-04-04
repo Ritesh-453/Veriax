@@ -26,6 +26,7 @@ def make_chart(labels, values, color, title):
     buf.seek(0)
     return base64.b64encode(buf.read()).decode('utf-8')
 
+
 def get_dashboard_data(db_path):
     db = get_db(db_path)
 
@@ -33,6 +34,16 @@ def get_dashboard_data(db_path):
     total_violations = db.execute('SELECT COUNT(*) FROM violations').fetchone()[0]
     scans_today = db.execute(
         "SELECT COUNT(*) FROM violations WHERE DATE(detected_at) = DATE('now')"
+    ).fetchone()[0]
+
+    # Critical violations (≥90%)
+    critical_count = db.execute(
+        "SELECT COUNT(*) FROM violations WHERE similarity >= 90"
+    ).fetchone()[0]
+
+    # DMCA notices generated (= violations above 70%)
+    dmca_count = db.execute(
+        "SELECT COUNT(*) FROM violations WHERE similarity >= 70"
     ).fetchone()[0]
 
     # Violations per day (last 7 days)
@@ -61,10 +72,18 @@ def get_dashboard_data(db_path):
     chart1 = make_chart(days, counts, '#4f46e5', 'Violations (last 7 days)') if days else None
     chart2 = make_chart(top_names, top_counts, '#e11d48', 'Most violated assets') if top_names else None
 
+    # Impact calculations
+    revenue_protected = total_violations * 50000   # ₹50,000 per violation estimate
+    hours_protected = total_assets * 3              # 3 hours broadcast per asset estimate
+
     return {
         'total_assets': total_assets,
         'total_violations': total_violations,
         'scans_today': scans_today,
+        'critical_count': critical_count,
+        'dmca_count': dmca_count,
+        'revenue_protected': revenue_protected,
+        'hours_protected': hours_protected,
         'chart1': chart1,
         'chart2': chart2
     }
