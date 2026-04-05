@@ -4,41 +4,31 @@
     "timestamp": "2026-01-01T00:00:00",
     "type": "GENESIS",
     "data": {
-      "message": "SportShield AI Blockchain \u2014 Tamper-Proof Violation Log"
+      "message": "VERIAX Blockchain \u2014 Tamper-Proof Violation Log"
     },
     "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-    "hash": "7e87a89704f3d877ea0efcbafc44b7b734bddb668092c2890b0fbfbf781e521d"
+    "hash": "69f802322f132f550f40d4c06c2a9c68feb27dea91f69aa7c5eace034c3fae2a"
   },
   {
     "index": 1,
-    "timestamp": "2026-03-21T17:03:28.279474",
-    "type": "VIOLATION",
+    "timestamp": "2026-04-05T20:16:23.730294",
+    "type": "ASSET_REGISTERED",
     "data": {
-      "asset_name": "Olympic Rings ",
-      "similarity": 99.08,
-      "risk_level": "CRITICAL",
-      "detection_methods": [
-        "pHash",
-        "dHash",
-        "aHash",
-        "SIFT",
-        "ORB",
-        "MobileNet"
-      ],
-      "found_url": null,
-      "scan_type": "IMAGE",
-      "evidence_hash": "499e51c3765adcf5"
+      "asset_name": "IPL Trophy 2026",
+      "filename": "07bc875d1ded46da8752e877bf6da7ec_Screenshot 2026-04-05 200624.png",
+      "fingerprint": "dc4a834972cd62f3...",
+      "registered_by": "VERIAX"
     },
-    "previous_hash": "7e87a89704f3d877ea0efcbafc44b7b734bddb668092c2890b0fbfbf781e521d",
-    "hash": "e44a57f1ddc433aecfea55a93a163ca13889bec2d9ce3fc8e18f7a7f100121e3"
+    "previous_hash": "69f802322f132f550f40d4c06c2a9c68feb27dea91f69aa7c5eace034c3fae2a",
+    "hash": "2aa5dc4385ca276aa9c735eab67f5c1fac45b804d2eaba73abc83009b2c9274e"
   },
   {
     "index": 2,
-    "timestamp": "2026-03-21T17:07:19.804164",
+    "timestamp": "2026-04-05T20:18:25.114130",
     "type": "VIOLATION",
     "data": {
-      "asset_name": "Olympic Rings ",
-      "similarity": 99.08,
+      "asset_name": "IPL Trophy 2026",
+      "similarity": 100.0,
       "risk_level": "CRITICAL",
       "detection_methods": [
         "pHash",
@@ -50,55 +40,9 @@
       ],
       "found_url": null,
       "scan_type": "IMAGE",
-      "evidence_hash": "499e51c3765adcf5"
+      "evidence_hash": "596e184cbf8c5eb0"
     },
-    "previous_hash": "e44a57f1ddc433aecfea55a93a163ca13889bec2d9ce3fc8e18f7a7f100121e3",
-    "hash": "cc6c24678f9dfcc9ae24d2013102acfdb43d4e5215022d1c792b80be73838a78"
-  },
-  {
-    "index": 3,
-    "timestamp": "2026-03-21T17:07:44.145429",
-    "type": "VIOLATION",
-    "data": {
-      "asset_name": "Olympic Rings ",
-      "similarity": 99.08,
-      "risk_level": "CRITICAL",
-      "detection_methods": [
-        "pHash",
-        "dHash",
-        "aHash",
-        "SIFT",
-        "ORB",
-        "MobileNet"
-      ],
-      "found_url": null,
-      "scan_type": "IMAGE",
-      "evidence_hash": "499e51c3765adcf5"
-    },
-    "previous_hash": "cc6c24678f9dfcc9ae24d2013102acfdb43d4e5215022d1c792b80be73838a78",
-    "hash": "c321b2f12ca791a45d547e2531a425eaab71a49986450bfa678891843e95ef7e"
-  },
-  {
-    "index": 4,
-    "timestamp": "2026-03-21T17:12:23.899843",
-    "type": "VIOLATION",
-    "data": {
-      "asset_name": "Olympic Rings ",
-      "similarity": 99.08,
-      "risk_level": "CRITICAL",
-      "detection_methods": [
-        "pHash",
-        "dHash",
-        "aHash",
-        "SIFT",
-        "ORB",
-        "MobileNet"
-      ],
-      "found_url": null,
-      "scan_type": "IMAGE",
-      "evidence_hash": "499e51c3765adcf5"
-    },
-    "previous_hash": "c321b2f12ca791a45d547e2531a425eaab71a49986450bfa678891843e95ef7e",
-    "hash": "59ce49535167588ff31d4aeb66ef343039f769b99b05f14fe796dd50b03d1523"
+    "previous_hash": "2aa5dc4385ca276aa9c735eab67f5c1fac45b804d2eaba73abc83009b2c9274e",
+    "hash": "25252213d446708547762c4ff93f04df4c506110d30b28ee34011d7e5a2b97f8"
   }
 ]
