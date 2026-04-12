@@ -8,10 +8,30 @@ import requests
 import os
 import uuid
 from datetime import datetime
-import threading
 import time
 
 scanner_bp = Blueprint('scanner', __name__)
+
+# ============================================================
+# TARGET PLATFORMS — searched one by one
+# ============================================================
+TARGET_PLATFORMS = [
+    {'name': 'YouTube',    'site': 'youtube.com'},
+    {'name': 'Instagram',  'site': 'instagram.com'},
+    {'name': 'Facebook',   'site': 'facebook.com'},
+    {'name': 'Twitter',    'site': 'twitter.com'},
+    {'name': 'Reddit',     'site': 'reddit.com'},
+    {'name': 'ESPN',       'site': 'espn.com'},
+    {'name': 'Cricbuzz',   'site': 'cricbuzz.com'},
+    {'name': 'NDTV Sports','site': 'sports.ndtv.com'},
+    {'name': 'Sky Sports', 'site': 'skysports.com'},
+    {'name': 'BBC Sport',  'site': 'bbc.com/sport'},
+]
+
+
+# ============================================================
+# HASH HELPERS
+# ============================================================
 
 def get_all_hashes(path):
     try:
@@ -39,129 +59,149 @@ def compare_hashes(h1, h2_phash, h2_dhash, h2_ahash):
     except:
         return 0
 
+
+# ============================================================
+# SERPAPI — site-specific image search
+# ============================================================
+
+def search_platform(asset_name, site, serpapi_key, num=3):
+    """Search one specific platform for asset images via SerpAPI."""
+    try:
+        response = requests.get(
+            'https://serpapi.com/search',
+            params={
+                'api_key': serpapi_key,
+                'engine': 'google_images',
+                'q': f'site:{site} {asset_name}',
+                'num': num,
+                'ijn': '0'
+            },
+            timeout=15
+        )
+        data = response.json()
+        items = data.get('images_results', [])[:num]  # Hard slice
+        # Filter to only keep results actually from the target site
+        filtered = [i for i in items if site in i.get('link','') or site in i.get('original','')]
+        result = filtered[:num] if filtered else items[:num]
+        print(f"  [{site}] Found {len(result)} relevant images")
+        return result
+    except Exception as e:
+        print(f"  [{site}] Search error: {e}")
+        return []
+
+
+# ============================================================
+# MAIN SCAN FUNCTION
+# ============================================================
+
 def search_and_scan(asset, db_path, upload_folder):
     try:
-        # SCANNER SWITCH — Change to True to enable, False to disable
-        SCANNER_ENABLED = False
-
         serpapi_key = os.getenv('SERPAPI_KEY')
-        if not SCANNER_ENABLED:
-            print("Scanner disabled — set SCANNER_ENABLED=True to enable")
-            return []
         if not serpapi_key:
-            print("SerpApi key missing")
+            print("[Scanner] SERPAPI_KEY missing in .env")
             return []
-
-        search_url = "https://serpapi.com/search"
-        params = {
-            'api_key': serpapi_key,
-            'engine': 'google_images',
-            'q': asset['name'] + ' sports logo',
-            'num': 5
-        }
-
-        response = requests.get(search_url, params=params, timeout=15)
-        results = response.json()
 
         violations = []
-        items = results.get('images_results', [])
-        print(f"Found {len(items)} images for {asset['name']}")
+        print(f"\n[Scanner] Scanning '{asset['name']}' across {len(TARGET_PLATFORMS)} platforms...")
 
-        for item in items:
-            img_url = item.get('original', '')
-            page_url = item.get('link', '')
+        for platform in TARGET_PLATFORMS:
+            items = search_platform(
+                asset['name'],
+                platform['site'],
+                serpapi_key,
+                num=5
+            )[:5]  # Hard limit to 5 per platform
 
-            if not img_url:
-                continue
+            for item in items:
+                img_url = item.get('original', '')
+                page_url = item.get('link', '')
 
-            try:
-                img_response = requests.get(img_url, timeout=8,
-                    headers={'User-Agent': 'Mozilla/5.0'})
+                if not img_url:
+                    continue
 
-                if img_response.status_code == 200:
+                try:
+                    img_response = requests.get(
+                        img_url, timeout=8,
+                        headers={'User-Agent': 'Mozilla/5.0'}
+                    )
+                    if img_response.status_code != 200:
+                        continue
+
+                    content_type = img_response.headers.get('Content-Type', '')
+                    if 'image' not in content_type:
+                        continue
+
                     temp_filename = f"scan_web_{uuid.uuid4().hex}.jpg"
                     temp_path = os.path.join(upload_folder, temp_filename)
-
                     with open(temp_path, 'wb') as f:
                         f.write(img_response.content)
 
                     scan_hashes = get_all_hashes(temp_path)
-                    if scan_hashes:
-                        # Hash score
-                        hash_score = compare_hashes(
-                            scan_hashes,
-                            asset['phash'],
-                            asset['dhash'],
-                            asset['ahash']
+                    if not scan_hashes:
+                        os.remove(temp_path)
+                        continue
+
+                    hash_score = compare_hashes(
+                        scan_hashes,
+                        asset['phash'], asset['dhash'], asset['ahash']
+                    )
+
+                    asset_path = os.path.join(upload_folder, asset['filename'])
+                    opencv_score = 0
+                    if os.path.exists(asset_path):
+                        opencv_score = combined_opencv_score(asset_path, temp_path)
+
+                    similarity = round(
+                        (hash_score * 0.3) + (opencv_score * 0.7), 2
+                    ) if opencv_score > 0 else hash_score
+
+                    print(f"    Hash:{hash_score}% OpenCV:{opencv_score}% "
+                          f"Final:{similarity}% — {platform['name']}")
+
+                    if similarity > 50:
+                        violations.append({
+                            'asset_id': asset['id'],
+                            'asset_name': asset['name'],
+                            'similarity': similarity,
+                            'found_url': page_url,
+                            'platform': platform['name'],
+                            'filename': temp_filename
+                        })
+
+                        db = get_db(db_path)
+                        db.execute(
+                            'INSERT INTO violations (asset_id, found_url, similarity) VALUES (?, ?, ?)',
+                            (asset['id'], page_url, similarity)
+                        )
+                        db.commit()
+                        db.close()
+
+                        save_violation_firebase(
+                            asset['id'], asset['name'], similarity, temp_filename
                         )
 
-                        # OpenCV SIFT+ORB score
-                        asset_path = os.path.join(
-                            upload_folder,
-                            asset['filename']
-                        )
-                        opencv_score = 0
-                        if os.path.exists(asset_path):
-                            opencv_score = combined_opencv_score(
-                                asset_path, temp_path
-                            )
+                        from routes.alerts import send_violation_alert
+                        send_violation_alert(asset['name'], similarity, page_url)
 
-                        # Combined score
-                        if opencv_score > 0:
-                            similarity = round(
-                                (hash_score * 0.3) + (opencv_score * 0.7), 2
-                            )
-                        else:
-                            similarity = hash_score
+                    else:
+                        if os.path.exists(temp_path):
+                            os.remove(temp_path)
 
-                        print(f"Hash: {hash_score}% | OpenCV: {opencv_score}% | Final: {similarity}% — {asset['name']}")
+                except Exception as e:
+                    print(f"    Image error: {e}")
+                    continue
 
-                        if similarity > 60:
-                            violations.append({
-                                'asset_id': asset['id'],
-                                'asset_name': asset['name'],
-                                'similarity': similarity,
-                                'found_url': page_url,
-                                'img_url': img_url,
-                                'filename': temp_filename
-                            })
-
-                            db = get_db(db_path)
-                            db.execute(
-                                '''INSERT INTO violations
-                                (asset_id, found_url, similarity)
-                                VALUES (?, ?, ?)''',
-                                (asset['id'], page_url, similarity)
-                            )
-                            db.commit()
-                            db.close()
-
-                            save_violation_firebase(
-                                asset['id'],
-                                asset['name'],
-                                similarity,
-                                temp_filename
-                            )
-
-                            from routes.alerts import send_violation_alert
-                            send_violation_alert(
-                                asset['name'],
-                                similarity,
-                                page_url
-                            )
-                        else:
-                            if os.path.exists(temp_path):
-                                os.remove(temp_path)
-
-            except Exception as e:
-                print(f"Error scanning image {img_url}: {e}")
-                continue
-
+        print(f"[Scanner] Done. Found {len(violations)} violations for '{asset['name']}'")
         return violations
 
     except Exception as e:
-        print(f"Search error: {e}")
+        print(f"[Scanner] Error: {e}")
         return []
+
+
+# ============================================================
+# SCHEDULED SCAN
+# ============================================================
 
 def run_scheduled_scan(app):
     with app.app_context():
@@ -171,21 +211,21 @@ def run_scheduled_scan(app):
                 db = get_db(app.config['DATABASE'])
                 assets = db.execute('SELECT * FROM assets').fetchall()
                 db.close()
-
-                total_violations = 0
+                total = 0
                 for asset in assets:
                     violations = search_and_scan(
-                        asset,
-                        app.config['DATABASE'],
-                        app.config['UPLOAD_FOLDER']
+                        asset, app.config['DATABASE'], app.config['UPLOAD_FOLDER']
                     )
-                    total_violations += len(violations)
-
-                print(f"[{datetime.now()}] Scan complete. Found {total_violations} violations.")
+                    total += len(violations)
+                print(f"[{datetime.now()}] Scan complete. {total} violations found.")
             except Exception as e:
                 print(f"Scheduled scan error: {e}")
-
             time.sleep(86400)
+
+
+# ============================================================
+# ROUTES
+# ============================================================
 
 @scanner_bp.route('/scanner')
 def scanner_dashboard():
@@ -199,9 +239,24 @@ def scanner_dashboard():
         ORDER BY v.detected_at DESC LIMIT 20
     ''').fetchall()
     db.close()
+
+    # Detect platform from URL
+    platform_counts = {}
+    for v in recent_violations:
+        url = v['found_url'] or ''
+        platform = 'other'
+        for p in TARGET_PLATFORMS:
+            if p['site'] in url:
+                platform = p['name']
+                break
+        platform_counts[platform] = platform_counts.get(platform, 0) + 1
+
     return render_template('scanner.html',
                            assets=assets,
-                           violations=recent_violations)
+                           violations=recent_violations,
+                           platform_counts=platform_counts,
+                           target_platforms=TARGET_PLATFORMS)
+
 
 @scanner_bp.route('/scanner/run', methods=['POST'])
 def manual_scan():
@@ -219,10 +274,17 @@ def manual_scan():
             )
             all_violations.extend(violations)
 
+        platform_summary = {}
+        for v in all_violations:
+            p = v.get('platform', 'unknown')
+            platform_summary[p] = platform_summary.get(p, 0) + 1
+
         return jsonify({
             'status': 'success',
             'violations_found': len(all_violations),
-            'message': f'Scan complete. Found {len(all_violations)} potential violations.'
+            'by_platform': platform_summary,
+            'message': f'Scan complete. Found {len(all_violations)} violations across '
+                       f'{len(platform_summary)} platforms.'
         })
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)})
