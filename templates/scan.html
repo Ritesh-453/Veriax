@@ -46,11 +46,28 @@
     </div>
     {% if ai_analysis %}
     <div class="card">
-        <div class="card-title"><i class="fas fa-robot" style="color:#8b5cf6;"></i> Gemini AI Analysis</div>
-        <div style="font-size:0.82rem; color:var(--text-secondary); line-height:1.7; white-space:pre-line;">
+        <div class="card-title"><i class="fas fa-robot" style="color:#8b5cf6;"></i> Groq AI Analysis</div>
+        <div id="ai-analysis-box" style="font-size:0.82rem; color:var(--text-secondary); line-height:1.8;">
             {{ ai_analysis }}
         </div>
     </div>
+    <script>
+    (function() {
+        var box = document.getElementById("ai-analysis-box");
+        if (!box) return;
+        var text = box.innerText;
+        // Split on numbered points like "1. " "2. " etc
+        var parts = text.split(/(?=\d+\.\s)/);
+        var html = parts.map(function(p) {
+            p = p.trim();
+            if (!p) return "";
+            // Bold **text**
+            p = p.replace(/\*\*(.*?)\*\*/g, "<strong style='color:var(--text-primary)'>$1</strong>");
+            return "<div style='margin-bottom:6px;'>" + p + "</div>";
+        }).join("");
+        box.innerHTML = html;
+    })();
+    </script>
     {% endif %}
 </div>
 {% endif %}

@@ -1,81 +1,98 @@
 import os
-from PIL import Image
 import base64
 import io
+from PIL import Image
+
 
 def pil_to_base64(img):
     buf = io.BytesIO()
     img.convert('RGB').save(buf, format='JPEG')
     return base64.b64encode(buf.getvalue()).decode()
 
+
+def _groq_vision(messages):
+    """Make a Groq API call with vision support."""
+    import requests
+    api_key = os.getenv('GROQ_API_KEY')
+    if not api_key:
+        raise ValueError("GROQ_API_KEY not set in .env")
+
+    response = requests.post(
+        'https://api.groq.com/openai/v1/chat/completions',
+        headers={
+            'Authorization': f'Bearer {api_key}',
+            'Content-Type': 'application/json'
+        },
+        json={
+            'model': 'meta-llama/llama-4-scout-17b-16e-instruct',
+            'messages': messages,
+            'max_tokens': 300
+        },
+        timeout=30
+    )
+    response.raise_for_status()
+    return response.json()['choices'][0]['message']['content']
+
+
 def analyze_image(image_path):
     try:
-        from google import genai
-        client = genai.Client(api_key=os.getenv('GEMINI_API_KEY'))
         img = Image.open(image_path)
         img_b64 = pil_to_base64(img)
-        response = client.models.generate_content(
-            model='gemini-2.0-flash',
-            contents=[
-                {'parts': [
-                    {'inline_data': {
-                        'mime_type': 'image/jpeg',
-                        'data': img_b64
-                    }},
-                    {'text': """You are a sports media forensics expert.
+
+        result = _groq_vision([{
+            'role': 'user',
+            'content': [
+                {
+                    'type': 'image_url',
+                    'image_url': {
+                        'url': f'data:image/jpeg;base64,{img_b64}'
+                    }
+                },
+                {
+                    'type': 'text',
+                    'text': """You are a sports media forensics expert.
 Analyze this image and provide:
 1. What sport or organization this relates to
 2. Whether this is official/professional media
 3. Any logos, watermarks, or copyright indicators
 4. Risk: likely to be misused or pirated?
 5. Verdict: PROTECTED ASSET or GENERIC CONTENT
-Max 6 lines."""}
-                ]}
+Max 6 lines."""
+                }
             ]
-        )
-        return response.text
+        }])
+        return result
+
     except Exception as e:
-        try:
-            img = Image.open(image_path)
-            w, h = img.size
-            size_kb = round(os.path.getsize(image_path)/1024, 1)
-            return f"""Image Analysis Report:
-- Dimensions: {w} x {h} pixels
-- Format: {img.format or 'PNG'} | Mode: {img.mode}
-- File size: {size_kb} KB
-- Quality: {"High resolution — professional media" if w > 800 else "Standard resolution"}
-- Type: {"Color image — potential branded content" if img.mode in ["RGB","RGBA"] else "Non-standard"}
-- Verdict: PROTECTED ASSET — fingerprint registered."""
-        except:
-            return "Analysis completed — fingerprint registered."
+        return f"AI Error: {type(e).__name__}: {str(e)}"
+
 
 def compare_images_ai(image_path1, image_path2):
     try:
-        from google import genai
-        client = genai.Client(api_key=os.getenv('GEMINI_API_KEY'))
         img1 = Image.open(image_path1)
         img2 = Image.open(image_path2)
-        response = client.models.generate_content(
-            model='gemini-2.0-flash',
-            contents=[
-                {'parts': [
-                    {'inline_data': {'mime_type': 'image/jpeg', 'data': pil_to_base64(img1)}},
-                    {'inline_data': {'mime_type': 'image/jpeg', 'data': pil_to_base64(img2)}},
-                    {'text': """Compare these two images as a forensics expert.
+
+        result = _groq_vision([{
+            'role': 'user',
+            'content': [
+                {
+                    'type': 'image_url',
+                    'image_url': {'url': f'data:image/jpeg;base64,{pil_to_base64(img1)}'}
+                },
+                {
+                    'type': 'image_url',
+                    'image_url': {'url': f'data:image/jpeg;base64,{pil_to_base64(img2)}'}
+                },
+                {
+                    'type': 'text',
+                    'text': """Compare these two images as a forensics expert.
 VERDICT: [INFRINGEMENT / LIKELY INFRINGEMENT / NO INFRINGEMENT]
 CONFIDENCE: [HIGH / MEDIUM / LOW]
-REASON: [one line]"""}
-                ]}
+REASON: [one line]"""
+                }
             ]
-        )
-        return response.text
+        }])
+        return result
+
     except Exception as e:
-        try:
-            img1 = Image.open(image_path1)
-            img2 = Image.open(image_path2)
-            diff = abs((img1.size[0]-img2.size[0]) + (img1.size[1]-img2.size[1]))
-            v = "INFRINGEMENT" if diff==0 else "LIKELY INFRINGEMENT"
-            c = "HIGH" if diff < 100 else "MEDIUM"
-            return f"VERDICT: {v}\nCONFIDENCE: {c}\nREASON: Hash matching system flagged this image."
-        except:
-            return "VERDICT: LIKELY INFRINGEMENT\nCONFIDENCE: MEDIUM\nREASON: Flagged by detection system."
+        return f"AI Error: {type(e).__name__}: {str(e)}"

@@ -41,7 +41,13 @@ def compare_hashes(h1, h2_phash, h2_dhash, h2_ahash):
 
 def search_and_scan(asset, db_path, upload_folder):
     try:
+        # SCANNER SWITCH — Change to True to enable, False to disable
+        SCANNER_ENABLED = False
+
         serpapi_key = os.getenv('SERPAPI_KEY')
+        if not SCANNER_ENABLED:
+            print("Scanner disabled — set SCANNER_ENABLED=True to enable")
+            return []
         if not serpapi_key:
             print("SerpApi key missing")
             return []

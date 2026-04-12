@@ -44,5 +44,235 @@
     },
     "previous_hash": "2aa5dc4385ca276aa9c735eab67f5c1fac45b804d2eaba73abc83009b2c9274e",
     "hash": "25252213d446708547762c4ff93f04df4c506110d30b28ee34011d7e5a2b97f8"
+  },
+  {
+    "index": 3,
+    "timestamp": "2026-04-05T22:13:45.673734",
+    "type": "VIOLATION",
+    "data": {
+      "asset_name": "IPL Trophy 2026",
+      "similarity": 100.0,
+      "risk_level": "CRITICAL",
+      "detection_methods": [
+        "pHash",
+        "dHash",
+        "aHash",
+        "SIFT",
+        "ORB",
+        "MobileNet"
+      ],
+      "found_url": null,
+      "scan_type": "IMAGE",
+      "evidence_hash": "596e184cbf8c5eb0"
+    },
+    "previous_hash": "25252213d446708547762c4ff93f04df4c506110d30b28ee34011d7e5a2b97f8",
+    "hash": "3bf35b50a3d5056e4bb2a44d62df8badad4bb6d105fb268da08e24b2c102dd66"
+  },
+  {
+    "index": 4,
+    "timestamp": "2026-04-06T22:58:11.462794",
+    "type": "VIOLATION",
+    "data": {
+      "asset_name": "IPL Trophy 2026",
+      "similarity": 100.0,
+      "risk_level": "CRITICAL",
+      "detection_methods": [
+        "pHash",
+        "dHash",
+        "aHash",
+        "SIFT",
+        "ORB",
+        "MobileNet"
+      ],
+      "found_url": null,
+      "scan_type": "IMAGE",
+      "evidence_hash": "0bac1871fee78dd9"
+    },
+    "previous_hash": "3bf35b50a3d5056e4bb2a44d62df8badad4bb6d105fb268da08e24b2c102dd66",
+    "hash": "81d1e99cff0e9aec1d76153cf51f1d048c0ce0fe31a403bef2694f6392195a12"
+  },
+  {
+    "index": 5,
+    "timestamp": "2026-04-06T22:58:11.693381",
+    "type": "VIOLATION",
+    "data": {
+      "asset_name": "IPL Trophy 2026",
+      "similarity": 100.0,
+      "risk_level": "CRITICAL",
+      "detection_methods": [
+        "pHash",
+        "dHash",
+        "aHash",
+        "SIFT",
+        "ORB",
+        "MobileNet"
+      ],
+      "found_url": null,
+      "scan_type": "IMAGE",
+      "evidence_hash": "0bac1871fee78dd9"
+    },
+    "previous_hash": "81d1e99cff0e9aec1d76153cf51f1d048c0ce0fe31a403bef2694f6392195a12",
+    "hash": "ba026f28fb232cab3a044e0e5f635afd4a98e1e6bbf8334fc76b8cd8414cce9c"
+  },
+  {
+    "index": 6,
+    "timestamp": "2026-04-12T15:08:13.033388",
+    "type": "VIOLATION",
+    "data": {
+      "asset_name": "IPL Trophy 2026",
+      "similarity": 100.0,
+      "risk_level": "CRITICAL",
+      "detection_methods": [
+        "pHash",
+        "dHash",
+        "aHash",
+        "SIFT",
+        "ORB",
+        "MobileNet"
+      ],
+      "found_url": null,
+      "scan_type": "IMAGE",
+      "evidence_hash": "f41aa176fa99c646"
+    },
+    "previous_hash": "ba026f28fb232cab3a044e0e5f635afd4a98e1e6bbf8334fc76b8cd8414cce9c",
+    "hash": "e82a521a350e076dd4599475d7e9aacc09a06909854a963cddf3b410eb46040f"
+  },
+  {
+    "index": 7,
+    "timestamp": "2026-04-12T15:17:24.342542",
+    "type": "VIOLATION",
+    "data": {
+      "asset_name": "IPL Trophy 2026",
+      "similarity": 100.0,
+      "risk_level": "CRITICAL",
+      "detection_methods": [
+        "pHash",
+        "dHash",
+        "aHash",
+        "SIFT",
+        "ORB",
+        "MobileNet"
+      ],
+      "found_url": null,
+      "scan_type": "IMAGE",
+      "evidence_hash": "f41aa176fa99c646"
+    },
+    "previous_hash": "e82a521a350e076dd4599475d7e9aacc09a06909854a963cddf3b410eb46040f",
+    "hash": "bb3657e0de3a020dc04e6c7d236898a1becf1403c3bec8056d623d7877db941f"
+  },
+  {
+    "index": 8,
+    "timestamp": "2026-04-12T15:23:42.248017",
+    "type": "VIOLATION",
+    "data": {
+      "asset_name": "IPL Trophy 2026",
+      "similarity": 100.0,
+      "risk_level": "CRITICAL",
+      "detection_methods": [
+        "pHash",
+        "dHash",
+        "aHash",
+        "SIFT",
+        "ORB",
+        "MobileNet"
+      ],
+      "found_url": null,
+      "scan_type": "IMAGE",
+      "evidence_hash": "f41aa176fa99c646"
+    },
+    "previous_hash": "bb3657e0de3a020dc04e6c7d236898a1becf1403c3bec8056d623d7877db941f",
+    "hash": "afbf47e2c10293b622b40552593167b8c1348dcc882d1a80868f76a9a7f95425"
+  },
+  {
+    "index": 9,
+    "timestamp": "2026-04-12T15:24:38.299241",
+    "type": "VIOLATION",
+    "data": {
+      "asset_name": "IPL Trophy 2026",
+      "similarity": 100.0,
+      "risk_level": "CRITICAL",
+      "detection_methods": [
+        "pHash",
+        "dHash",
+        "aHash",
+        "SIFT",
+        "ORB",
+        "MobileNet"
+      ],
+      "found_url": null,
+      "scan_type": "IMAGE",
+      "evidence_hash": "f41aa176fa99c646"
+    },
+    "previous_hash": "afbf47e2c10293b622b40552593167b8c1348dcc882d1a80868f76a9a7f95425",
+    "hash": "5b540c6fa2591a9cf5a7977699202e837876f3af759a09cc57c0485513a35e8e"
+  },
+  {
+    "index": 10,
+    "timestamp": "2026-04-12T15:28:54.795989",
+    "type": "VIOLATION",
+    "data": {
+      "asset_name": "IPL Trophy 2026",
+      "similarity": 100.0,
+      "risk_level": "CRITICAL",
+      "detection_methods": [
+        "pHash",
+        "dHash",
+        "aHash",
+        "SIFT",
+        "ORB",
+        "MobileNet"
+      ],
+      "found_url": null,
+      "scan_type": "IMAGE",
+      "evidence_hash": "f41aa176fa99c646"
+    },
+    "previous_hash": "5b540c6fa2591a9cf5a7977699202e837876f3af759a09cc57c0485513a35e8e",
+    "hash": "9b4d06ddaa700b99f3098fecca1f690e5d3a76c13c735e0d2718c4c0385bb168"
+  },
+  {
+    "index": 11,
+    "timestamp": "2026-04-12T15:32:12.015634",
+    "type": "VIOLATION",
+    "data": {
+      "asset_name": "IPL Trophy 2026",
+      "similarity": 100.0,
+      "risk_level": "CRITICAL",
+      "detection_methods": [
+        "pHash",
+        "dHash",
+        "aHash",
+        "SIFT",
+        "ORB",
+        "MobileNet"
+      ],
+      "found_url": null,
+      "scan_type": "IMAGE",
+      "evidence_hash": "f41aa176fa99c646"
+    },
+    "previous_hash": "9b4d06ddaa700b99f3098fecca1f690e5d3a76c13c735e0d2718c4c0385bb168",
+    "hash": "62cffb50432d95f5ae34cd6dcb8398a16f77a0e80671a1b8ad672467f56e1486"
+  },
+  {
+    "index": 12,
+    "timestamp": "2026-04-12T15:34:13.418702",
+    "type": "VIOLATION",
+    "data": {
+      "asset_name": "IPL Trophy 2026",
+      "similarity": 100.0,
+      "risk_level": "CRITICAL",
+      "detection_methods": [
+        "pHash",
+        "dHash",
+        "aHash",
+        "SIFT",
+        "ORB",
+        "MobileNet"
+      ],
+      "found_url": null,
+      "scan_type": "IMAGE",
+      "evidence_hash": "f41aa176fa99c646"
+    },
+    "previous_hash": "62cffb50432d95f5ae34cd6dcb8398a16f77a0e80671a1b8ad672467f56e1486",
+    "hash": "4da3712b20589c7306db545fb57c9fde9cca58d71dcbc4f5885193f0b02570ff"
   }
 ]
