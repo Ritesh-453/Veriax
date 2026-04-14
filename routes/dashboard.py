@@ -73,7 +73,7 @@ def get_dashboard_data(db_path):
     chart2 = make_chart(top_names, top_counts, '#e11d48', 'Most violated assets') if top_names else None
 
     # Impact calculations
-    revenue_protected = total_violations * 50000   # ₹50,000 per violation estimate
+    revenue_protected = total_violations * 3000   # ₹3,000 per violation estimate
     hours_protected = total_assets * 3              # 3 hours broadcast per asset estimate
 
     return {
