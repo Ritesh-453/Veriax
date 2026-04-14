@@ -274,5 +274,18 @@
     },
     "previous_hash": "62cffb50432d95f5ae34cd6dcb8398a16f77a0e80671a1b8ad672467f56e1486",
     "hash": "4da3712b20589c7306db545fb57c9fde9cca58d71dcbc4f5885193f0b02570ff"
+  },
+  {
+    "index": 13,
+    "timestamp": "2026-04-14T14:34:34.979272",
+    "type": "ASSET_REGISTERED",
+    "data": {
+      "asset_name": "Virat Kohli Highlights",
+      "filename": "reg_video_9af359a42ca043d9983ece192ae53a1b.mp4",
+      "fingerprint": "VIDEO:5_frames...",
+      "registered_by": "VERIAX"
+    },
+    "previous_hash": "4da3712b20589c7306db545fb57c9fde9cca58d71dcbc4f5885193f0b02570ff",
+    "hash": "3e17417b8add9fc5c1107b12f5aa9c047e7d862fb8de8866fc2a006e4d697214"
   }
 ]

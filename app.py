@@ -82,7 +82,7 @@ def video_scan():
                                    violations=[], video_info=None)
 
         file = request.files['video']
-        interval = int(request.form.get('interval', 2))
+        interval = int(request.form.get('interval', 3))
 
         if file.filename == '':
             return render_template('video_scan.html',

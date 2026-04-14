@@ -29,6 +29,9 @@ def init_db(db_path):
         ('license_start', 'DATE DEFAULT NULL'),
         ('license_end', 'DATE DEFAULT NULL'),
         ('license_owner', 'TEXT DEFAULT NULL'),
+        ('asset_type', 'TEXT NOT NULL DEFAULT "IMAGE"'),
+        ('duration', 'REAL DEFAULT NULL'),
+        ('frame_count', 'INTEGER DEFAULT NULL'),
     ]:
         try:
             cursor.execute(f'ALTER TABLE assets ADD COLUMN {col} {definition}')
@@ -118,6 +121,46 @@ def init_db(db_path):
             matched_asset TEXT DEFAULT NULL,
             risk_level TEXT DEFAULT 'LOW',
             scanned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # ── VIDEO FRAMES ────────────────────────────────────────
+    # Stores hashes for each keyframe extracted from a registered video asset.
+    # Linked to assets table via asset_id. Used during video scanning to
+    # compare suspect frames against registered content.
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS video_frames (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            asset_id INTEGER NOT NULL,
+            frame_filename TEXT NOT NULL,
+            timestamp REAL NOT NULL,
+            time_str TEXT NOT NULL,
+            phash TEXT NOT NULL,
+            dhash TEXT NOT NULL DEFAULT '',
+            ahash TEXT NOT NULL DEFAULT '',
+            FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE CASCADE
+        )
+    ''')
+
+    # ── VIDEO FINGERPRINTS (robust, edit-resistant) ──────────────────────────
+    # Stores CLIP embeddings + flipped hashes per keyframe.
+    # Used by the robust fingerprinting system to detect edited/re-encoded clips.
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS video_fingerprints (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            asset_id INTEGER NOT NULL,
+            frame_index INTEGER NOT NULL,
+            timestamp REAL NOT NULL,
+            time_str TEXT NOT NULL,
+            clip_embedding TEXT,
+            clip_flip_embedding TEXT,
+            phash TEXT NOT NULL DEFAULT '',
+            dhash TEXT NOT NULL DEFAULT '',
+            ahash TEXT NOT NULL DEFAULT '',
+            phash_flip TEXT NOT NULL DEFAULT '',
+            dhash_flip TEXT NOT NULL DEFAULT '',
+            ahash_flip TEXT NOT NULL DEFAULT '',
+            FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE CASCADE
         )
     ''')
 

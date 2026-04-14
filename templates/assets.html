@@ -44,17 +44,53 @@
             {% for asset in assets %}
             <tr>
                 <td>
-                    <div style="font-weight:600; color:var(--text-primary); font-size:0.85rem;">
+                    <div style="display:flex; align-items:center; gap:7px;">
+                        {% if asset.asset_type == 'VIDEO' %}
+                        <span style="background:#ede9fe; color:#7c3aed; border-radius:5px;
+                                     padding:2px 7px; font-size:0.65rem; font-weight:700; letter-spacing:0.03em;">
+                            <i class="fas fa-film"></i> VIDEO
+                        </span>
+                        {% else %}
+                        <span style="background:#e0f2fe; color:#0369a1; border-radius:5px;
+                                     padding:2px 7px; font-size:0.65rem; font-weight:700; letter-spacing:0.03em;">
+                            <i class="fas fa-image"></i> IMAGE
+                        </span>
+                        {% endif %}
+                    </div>
+                    <div style="font-weight:600; color:var(--text-primary); font-size:0.85rem; margin-top:4px;">
                         {{ asset.name }}
                     </div>
                     <div style="font-size:0.68rem; color:var(--text-muted); margin-top:2px;">
-                        {{ asset.filename[:24] }}{% if asset.filename|length > 24 %}...{% endif %}
+                        {% if asset.asset_type == 'VIDEO' %}
+                            {{ asset.registered_frames }} frames fingerprinted
+                            {% if asset.duration %} · {{ '%d:%02d'|format((asset.duration // 60)|int, (asset.duration % 60)|int) }}{% endif %}
+                        {% else %}
+                            {{ asset.filename[:24] }}{% if asset.filename|length > 24 %}...{% endif %}
+                        {% endif %}
                     </div>
                 </td>
                 <td>
+                    {% if asset.asset_type == 'VIDEO' %}
+                    <div style="position:relative; width:44px; height:44px;">
+                        <img src="/uploads/video_frames/{{ asset.filename }}"
+                             style="width:44px; height:44px; object-fit:cover; border-radius:7px;
+                                    border:1px solid var(--card-border); background:#fafbfe;"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display:none; width:44px; height:44px; border-radius:7px;
+                                    border:1px solid var(--card-border); background:#f5f3ff;
+                                    align-items:center; justify-content:center;">
+                            <i class="fas fa-film" style="color:#7c3aed; font-size:1.1rem;"></i>
+                        </div>
+                        <div style="position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.55);
+                                    border-radius:3px; padding:1px 3px;">
+                            <i class="fas fa-play" style="color:white; font-size:0.45rem;"></i>
+                        </div>
+                    </div>
+                    {% else %}
                     <img src="/uploads/{{ asset.filename }}"
                          style="width:44px; height:44px; object-fit:contain; border-radius:7px;
                                 border:1px solid var(--card-border); background:#fafbfe;">
+                    {% endif %}
                 </td>
                 <td>
                     <div style="display:flex; align-items:center; gap:8px;">
@@ -122,49 +158,160 @@
     <div class="card-title">
         <i class="fas fa-plus-circle" style="color:#6366f1;"></i> Register New Asset
     </div>
-    <form method="POST" action="/assets/upload" enctype="multipart/form-data">
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
-            <div>
-                <label class="form-label">Asset Name *</label>
-                <input type="text" name="name" required class="form-input"
-                       placeholder="e.g. FIFA World Cup 2026 Logo">
-            </div>
-            <div>
-                <label class="form-label">Image File *</label>
-                <input type="file" name="image" id="asset-img" accept="image/*" required class="file-upload-real">
-                <div class="file-upload-zone" id="asset-zone" style="padding:12px 14px;">
-                    <div class="upload-icon" style="width:32px; height:32px;"><i class="fas fa-image"></i></div>
-                    <div class="upload-text">
-                        <div class="upload-title" id="asset-title" style="font-size:0.8rem;">Click to upload</div>
-                        <div class="upload-sub" id="asset-sub" style="font-size:0.68rem;">PNG, JPG, WebP</div>
-                    </div>
-                    <div class="upload-btn" style="font-size:0.7rem; padding:5px 10px;">Browse</div>
-                </div>
-            </div>
-            <div>
-                <label class="form-label">License Owner (optional)</label>
-                <input type="text" name="license_owner" class="form-input" placeholder="e.g. FIFA, IOC, IPL">
-            </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div>
-                    <label class="form-label">License Start</label>
-                    <input type="date" name="license_start" class="form-input">
-                </div>
-                <div>
-                    <label class="form-label">License End</label>
-                    <input type="date" name="license_end" class="form-input">
-                </div>
-            </div>
-        </div>
-        <button type="submit" class="btn btn-primary" style="margin-top:16px;">
-            <i class="fas fa-plus"></i> Register Asset
+
+    <!-- Tab switcher -->
+    <div style="display:flex; gap:0; margin-bottom:20px; border-bottom:2px solid var(--card-border);">
+        <button id="tab-image-btn" onclick="switchTab('image')"
+                style="padding:8px 20px; font-size:0.82rem; font-weight:600; border:none;
+                       background:none; cursor:pointer; color:#6366f1;
+                       border-bottom:2px solid #6366f1; margin-bottom:-2px;">
+            <i class="fas fa-image"></i> Image Asset
         </button>
-    </form>
+        <button id="tab-video-btn" onclick="switchTab('video')"
+                style="padding:8px 20px; font-size:0.82rem; font-weight:600; border:none;
+                       background:none; cursor:pointer; color:var(--text-muted);
+                       border-bottom:2px solid transparent; margin-bottom:-2px;">
+            <i class="fas fa-film"></i> Video Asset
+        </button>
+    </div>
+
+    <!-- IMAGE FORM -->
+    <div id="tab-image">
+        <form method="POST" action="/assets/upload" enctype="multipart/form-data">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                <div>
+                    <label class="form-label">Asset Name *</label>
+                    <input type="text" name="name" required class="form-input"
+                           placeholder="e.g. FIFA World Cup 2026 Logo">
+                </div>
+                <div>
+                    <label class="form-label">Image File *</label>
+                    <input type="file" name="image" id="asset-img" accept="image/*" required class="file-upload-real">
+                    <div class="file-upload-zone" id="asset-zone" style="padding:12px 14px;">
+                        <div class="upload-icon" style="width:32px; height:32px;"><i class="fas fa-image"></i></div>
+                        <div class="upload-text">
+                            <div class="upload-title" id="asset-title" style="font-size:0.8rem;">Click to upload</div>
+                            <div class="upload-sub" id="asset-sub" style="font-size:0.68rem;">PNG, JPG, WebP</div>
+                        </div>
+                        <div class="upload-btn" style="font-size:0.7rem; padding:5px 10px;">Browse</div>
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label">License Owner (optional)</label>
+                    <input type="text" name="license_owner" class="form-input" placeholder="e.g. FIFA, IOC, IPL">
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div>
+                        <label class="form-label">License Start</label>
+                        <input type="date" name="license_start" class="form-input">
+                    </div>
+                    <div>
+                        <label class="form-label">License End</label>
+                        <input type="date" name="license_end" class="form-input">
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top:16px;">
+                <i class="fas fa-plus"></i> Register Image Asset
+            </button>
+        </form>
+    </div>
+
+    <!-- VIDEO FORM -->
+    <div id="tab-video" style="display:none;">
+        <div style="background:#f5f3ff; border:1px solid #ddd6fe; border-radius:8px;
+                    padding:10px 14px; margin-bottom:16px; font-size:0.8rem; color:#6d28d9;">
+            <i class="fas fa-circle-info"></i>
+            Upload your <strong>official</strong> video to register it as a protected asset.
+            SportShield will extract keyframes and fingerprint each one — so any unauthorized
+            copy of this footage can be detected during scanning.
+        </div>
+        <form method="POST" action="/assets/upload_video" enctype="multipart/form-data" onsubmit="return showVideoProgress(this)">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                <div>
+                    <label class="form-label">Asset Name *</label>
+                    <input type="text" name="name" required class="form-input"
+                           placeholder="e.g. IPL 2026 Opening Ceremony">
+                </div>
+                <div>
+                    <label class="form-label">Video File *</label>
+                    <input type="file" name="video" id="asset-vid" accept="video/*" required class="file-upload-real">
+                    <div class="file-upload-zone" id="video-zone" style="padding:12px 14px;">
+                        <div class="upload-icon" style="width:32px; height:32px; background:#ede9fe; color:#7c3aed;">
+                            <i class="fas fa-film"></i>
+                        </div>
+                        <div class="upload-text">
+                            <div class="upload-title" id="video-title" style="font-size:0.8rem;">Click to upload</div>
+                            <div class="upload-sub" id="video-sub" style="font-size:0.68rem;">MP4, MOV, AVI, MKV, WebM</div>
+                        </div>
+                        <div class="upload-btn" style="font-size:0.7rem; padding:5px 10px;">Browse</div>
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label">License Owner (optional)</label>
+                    <input type="text" name="license_owner" class="form-input" placeholder="e.g. BCCI, FIFA, IOC">
+                </div>
+                <div>
+                    <label class="form-label">Keyframe Interval (seconds)</label>
+                    <select name="interval" class="form-input">
+                        <option value="2">Every 2s — high detail (larger storage)</option>
+                        <option value="3" selected>Every 3s — recommended</option>
+                        <option value="5">Every 5s — lighter, faster</option>
+                        <option value="10">Every 10s — minimal (long videos)</option>
+                    </select>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div>
+                        <label class="form-label">License Start</label>
+                        <input type="date" name="license_start" class="form-input">
+                    </div>
+                    <div>
+                        <label class="form-label">License End</label>
+                        <input type="date" name="license_end" class="form-input">
+                    </div>
+                </div>
+            </div>
+            <button type="submit" id="video-submit-btn" class="btn btn-primary"
+                    style="margin-top:16px; background:linear-gradient(135deg,#7c3aed,#6366f1);">
+                <i class="fas fa-film"></i> Register Video Asset
+            </button>
+            <div id="video-progress" style="display:none; margin-top:12px; padding:10px 14px;
+                 background:#f5f3ff; border-radius:8px; font-size:0.8rem; color:#6d28d9;">
+                <i class="fas fa-spinner fa-spin"></i>
+                Extracting and fingerprinting keyframes — this may take a moment...
+            </div>
+        </form>
+    </div>
 </div>
 
 <script>
+function switchTab(tab) {
+    const isImage = tab === 'image';
+    document.getElementById('tab-image').style.display = isImage ? 'block' : 'none';
+    document.getElementById('tab-video').style.display = isImage ? 'none' : 'block';
+
+    const imgBtn = document.getElementById('tab-image-btn');
+    const vidBtn = document.getElementById('tab-video-btn');
+
+    imgBtn.style.color = isImage ? '#6366f1' : 'var(--text-muted)';
+    imgBtn.style.borderBottomColor = isImage ? '#6366f1' : 'transparent';
+    vidBtn.style.color = isImage ? 'var(--text-muted)' : '#7c3aed';
+    vidBtn.style.borderBottomColor = isImage ? 'transparent' : '#7c3aed';
+}
+
+function showVideoProgress(form) {
+    const btn = document.getElementById('video-submit-btn');
+    setTimeout(() => {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        document.getElementById('video-progress').style.display = 'block';
+    }, 100);
+    return true;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initFileUpload('asset-zone', 'asset-img', 'asset-title', 'asset-sub', 'image');
+    initFileUpload('video-zone', 'asset-vid', 'video-title', 'video-sub', 'video');
 });
 </script>
 

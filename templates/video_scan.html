@@ -89,13 +89,124 @@
         <div class="stat-value" style="font-size:1.5rem; color:#8b5cf6;">{{ video_info.frames_scanned * 5 }}</div>
     </div>
     <div class="stat-card" style="padding:14px; border-top:2px solid #ef4444; border-left:none; border-right:none; border-bottom:none;">
-        <div class="stat-label">Violations</div>
+        <div class="stat-label">Asset Violations</div>
         <div class="stat-value" style="font-size:1.5rem; color:#ef4444;">{{ violations|length }}</div>
     </div>
     <div class="stat-card" style="padding:14px; border-top:2px solid #10b981; border-left:none; border-right:none; border-bottom:none;">
         <div class="stat-label">Duration</div>
         <div class="stat-value" style="font-size:1.5rem; color:#10b981;">{{ video_info.duration }}s</div>
     </div>
+</div>
+{% endif %}
+
+{% if match_analysis %}
+{% set rl = match_analysis.risk_level %}
+{% set rl_color = '#ef4444' if rl == 'CRITICAL' else '#f97316' if rl == 'HIGH' else '#f59e0b' if rl == 'MEDIUM' else '#10b981' %}
+{% set rl_bg = '#fff1f2' if rl in ['CRITICAL','HIGH'] else '#fffbeb' if rl == 'MEDIUM' else '#f0fdf4' %}
+
+<div class="card" style="border-top:3px solid {{ rl_color }}; margin-bottom:18px;">
+    <div class="card-title">
+        <i class="fas fa-broadcast-tower" style="color:{{ rl_color }};"></i>
+        Match Content Analysis
+        <span class="badge" style="margin-left:8px; background:{{ rl_color }}; color:#fff; font-size:0.7rem;">
+            {{ rl }}
+        </span>
+    </div>
+
+    <!-- Main Verdict -->
+    <div style="background:{{ rl_bg }}; border:1px solid {{ rl_color }}33; border-radius:10px;
+                padding:16px 18px; margin-bottom:16px;">
+        <div style="font-weight:700; font-size:0.95rem; color:{{ rl_color }}; margin-bottom:6px;">
+            {% if match_analysis.is_match_content %}
+            🚨 Unauthorized Match/Highlight Content Detected
+            {% else %}
+            ✅ No Match Content Detected
+            {% endif %}
+        </div>
+        <div style="font-size:0.85rem; color:var(--text-primary); line-height:1.5;">
+            {{ match_analysis.verdict }}
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px;">
+        <div style="background:var(--bg-secondary); border-radius:8px; padding:12px; text-align:center;">
+            <div style="font-size:1.6rem; font-weight:700; color:{{ rl_color }};">
+                {{ match_analysis.match_percentage }}%
+            </div>
+            <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">Match Frame Rate</div>
+        </div>
+        <div style="background:var(--bg-secondary); border-radius:8px; padding:12px; text-align:center;">
+            <div style="font-size:1.6rem; font-weight:700; color:#6366f1;">
+                {{ match_analysis.overall_confidence }}%
+            </div>
+            <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">Avg AI Confidence</div>
+        </div>
+        <div style="background:var(--bg-secondary); border-radius:8px; padding:12px; text-align:center;">
+            <div style="font-size:1.6rem; font-weight:700; color:#8b5cf6;">
+                {{ match_analysis.match_frames }}/{{ match_analysis.total_frames_analyzed }}
+            </div>
+            <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">Frames w/ Match Content</div>
+        </div>
+    </div>
+
+    <!-- Detected Indicators -->
+    {% if match_analysis.all_indicators %}
+    <div style="margin-bottom:14px;">
+        <div style="font-size:0.78rem; font-weight:600; color:var(--text-muted); margin-bottom:8px;">
+            DETECTED BROADCAST INDICATORS
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+            {% for ind in match_analysis.all_indicators %}
+            <span style="background:#f1f5f9; border:1px solid #e2e8f0; border-radius:999px;
+                         padding:3px 10px; font-size:0.72rem; color:var(--text-primary); font-weight:500;">
+                📡 {{ ind }}
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Per-Frame Breakdown -->
+    {% if match_analysis.frame_results %}
+    <div>
+        <div style="font-size:0.78rem; font-weight:600; color:var(--text-muted); margin-bottom:8px;">
+            FRAME-BY-FRAME BREAKDOWN (AI sampled)
+        </div>
+        <div style="display:grid; gap:6px;">
+            {% for fr in match_analysis.frame_results %}
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 12px;
+                        border-radius:7px; background:var(--bg-secondary);
+                        border-left:3px solid {{ '#ef4444' if fr.is_match_content else '#10b981' }};">
+                <img src="/uploads/video_frames/{{ fr.frame_filename }}"
+                     style="width:72px; height:40px; object-fit:cover; border-radius:4px; flex-shrink:0;"
+                     onerror="this.style.display='none'">
+                <div style="min-width:50px; font-size:0.75rem; font-weight:600; color:var(--text-muted);">
+                    {{ fr.timestamp }}
+                </div>
+                <div style="flex:1;">
+                    {% if fr.is_match_content %}
+                    <span style="font-size:0.75rem; color:#ef4444; font-weight:600;">🔴 Match Content</span>
+                    {% if fr.indicators %}
+                    <span style="font-size:0.7rem; color:var(--text-muted); margin-left:6px;">
+                        — {{ fr.indicators | join(', ') }}
+                    </span>
+                    {% endif %}
+                    {% else %}
+                    <span style="font-size:0.75rem; color:#10b981; font-weight:600;">✅ Clean</span>
+                    {% if fr.verdict %}
+                    <span style="font-size:0.7rem; color:var(--text-muted); margin-left:6px;">— {{ fr.verdict[:60] }}</span>
+                    {% endif %}
+                    {% endif %}
+                </div>
+                <div style="font-size:0.72rem; font-weight:700; color:#6366f1; flex-shrink:0;">
+                    {{ fr.confidence }}%
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endif %}
 
@@ -176,7 +287,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function showProgress() {
     document.getElementById('scan-progress').style.display = 'block';
-    document.querySelector('#video-form button[type="submit"]').disabled = true;
+    setTimeout(() => {
+        document.querySelector('#video-form button[type="submit"]').disabled = true;
+    }, 100);
 
     const steps = [
         [0, 15, 'Step 1/4: Uploading video', 'Transferring to server...'],
