@@ -1,14 +1,15 @@
 flask==3.0.3
 flask-cors==4.0.1
 python-dotenv==1.0.1
-firebase-admin==6.5.0
+firebase-admin==6.3.0
+protobuf==4.25.3
 google-generativeai==0.7.2
 Pillow==10.4.0
 opencv-python-headless==4.10.0.84
 numpy==1.26.4
 imagehash==4.3.1
 reportlab==4.2.2
-matplotlib==3.9.1
+matplotlib==3.9.2
 requests==2.32.3
 exifread==3.0.0
 gunicorn==22.0.0
