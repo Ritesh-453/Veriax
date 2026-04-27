@@ -1,0 +1,16 @@
+flask
+flask-cors
+python-dotenv
+firebase-admin
+google-generativeai
+Pillow
+opencv-python-headless
+numpy
+torch
+torchvision
+imagehash
+reportlab
+matplotlib
+requests
+exifread
+gunicorn
