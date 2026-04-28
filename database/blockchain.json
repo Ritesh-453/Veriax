@@ -11,117 +11,77 @@
   },
   {
     "index": 1,
-    "timestamp": "2026-04-05T20:16:23.730294",
+    "timestamp": "2026-04-26T10:00:46.818677",
     "type": "ASSET_REGISTERED",
     "data": {
-      "asset_name": "IPL Trophy 2026",
-      "filename": "07bc875d1ded46da8752e877bf6da7ec_Screenshot 2026-04-05 200624.png",
-      "fingerprint": "dc4a834972cd62f3...",
+      "asset_name": "IPL Winner 2025",
+      "filename": "cebd1ac0882c48ce88f36f3cdae983c5_IPL winner.jpg",
+      "fingerprint": "dacd233c522c4e5b...",
       "registered_by": "VERIAX"
     },
     "previous_hash": "69f802322f132f550f40d4c06c2a9c68feb27dea91f69aa7c5eace034c3fae2a",
-    "hash": "2aa5dc4385ca276aa9c735eab67f5c1fac45b804d2eaba73abc83009b2c9274e"
+    "hash": "d0005fc27cb6fe6c999de032884e177c283b56b54e5a88937bcc94d5186781f1"
   },
   {
     "index": 2,
-    "timestamp": "2026-04-05T20:18:25.114130",
-    "type": "VIOLATION",
+    "timestamp": "2026-04-26T10:01:23.579656",
+    "type": "ASSET_REGISTERED",
     "data": {
-      "asset_name": "IPL Trophy 2026",
-      "similarity": 100.0,
-      "risk_level": "CRITICAL",
-      "detection_methods": [
-        "pHash",
-        "dHash",
-        "aHash",
-        "SIFT",
-        "ORB",
-        "MobileNet"
-      ],
-      "found_url": null,
-      "scan_type": "IMAGE",
-      "evidence_hash": "596e184cbf8c5eb0"
+      "asset_name": "Virat Kohli Innings",
+      "filename": "reg_video_41b7765815ef4845ade846edbacf920d.mp4",
+      "fingerprint": "VIDEO:1_frames...",
+      "registered_by": "VERIAX"
     },
-    "previous_hash": "2aa5dc4385ca276aa9c735eab67f5c1fac45b804d2eaba73abc83009b2c9274e",
-    "hash": "25252213d446708547762c4ff93f04df4c506110d30b28ee34011d7e5a2b97f8"
+    "previous_hash": "d0005fc27cb6fe6c999de032884e177c283b56b54e5a88937bcc94d5186781f1",
+    "hash": "16a5d695de679a1f464a450e9e6a718f2eab28c50db96951de3a6fad92ebbc3d"
   },
   {
     "index": 3,
-    "timestamp": "2026-04-05T22:13:45.673734",
-    "type": "VIOLATION",
+    "timestamp": "2026-04-26T10:02:36.742892",
+    "type": "ASSET_REGISTERED",
     "data": {
-      "asset_name": "IPL Trophy 2026",
-      "similarity": 100.0,
-      "risk_level": "CRITICAL",
-      "detection_methods": [
-        "pHash",
-        "dHash",
-        "aHash",
-        "SIFT",
-        "ORB",
-        "MobileNet"
-      ],
-      "found_url": null,
-      "scan_type": "IMAGE",
-      "evidence_hash": "596e184cbf8c5eb0"
+      "asset_name": "Virat Kohli Celebration",
+      "filename": "reg_video_7b161feb18c74f67aaeebce8db9d3ef0.mp4",
+      "fingerprint": "VIDEO:2_frames...",
+      "registered_by": "VERIAX"
     },
-    "previous_hash": "25252213d446708547762c4ff93f04df4c506110d30b28ee34011d7e5a2b97f8",
-    "hash": "3bf35b50a3d5056e4bb2a44d62df8badad4bb6d105fb268da08e24b2c102dd66"
+    "previous_hash": "16a5d695de679a1f464a450e9e6a718f2eab28c50db96951de3a6fad92ebbc3d",
+    "hash": "79c94698a65eff72e6910ece6c9dbc4f2d71e3671b76853e54014158c92883be"
   },
   {
     "index": 4,
-    "timestamp": "2026-04-06T22:58:11.462794",
-    "type": "VIOLATION",
+    "timestamp": "2026-04-26T10:03:34.384676",
+    "type": "ASSET_REGISTERED",
     "data": {
-      "asset_name": "IPL Trophy 2026",
-      "similarity": 100.0,
-      "risk_level": "CRITICAL",
-      "detection_methods": [
-        "pHash",
-        "dHash",
-        "aHash",
-        "SIFT",
-        "ORB",
-        "MobileNet"
-      ],
-      "found_url": null,
-      "scan_type": "IMAGE",
-      "evidence_hash": "0bac1871fee78dd9"
+      "asset_name": "Virat Kolhi Aggression",
+      "filename": "reg_video_ddfd94883fa24a74a0447647f0bb3b13.mp4",
+      "fingerprint": "VIDEO:1_frames...",
+      "registered_by": "VERIAX"
     },
-    "previous_hash": "3bf35b50a3d5056e4bb2a44d62df8badad4bb6d105fb268da08e24b2c102dd66",
-    "hash": "81d1e99cff0e9aec1d76153cf51f1d048c0ce0fe31a403bef2694f6392195a12"
+    "previous_hash": "79c94698a65eff72e6910ece6c9dbc4f2d71e3671b76853e54014158c92883be",
+    "hash": "ddb1a08eddaa7f6e87609b109f3ad92c6fba744d13b5d7332b777ac721b69dff"
   },
   {
     "index": 5,
-    "timestamp": "2026-04-06T22:58:11.693381",
-    "type": "VIOLATION",
+    "timestamp": "2026-04-26T10:04:15.687034",
+    "type": "ASSET_REGISTERED",
     "data": {
-      "asset_name": "IPL Trophy 2026",
-      "similarity": 100.0,
-      "risk_level": "CRITICAL",
-      "detection_methods": [
-        "pHash",
-        "dHash",
-        "aHash",
-        "SIFT",
-        "ORB",
-        "MobileNet"
-      ],
-      "found_url": null,
-      "scan_type": "IMAGE",
-      "evidence_hash": "0bac1871fee78dd9"
+      "asset_name": "Virat Kohli Celebration",
+      "filename": "reg_video_a4e94e48ed594b68a776dd3edb189d43.mp4",
+      "fingerprint": "VIDEO:2_frames...",
+      "registered_by": "VERIAX"
     },
-    "previous_hash": "81d1e99cff0e9aec1d76153cf51f1d048c0ce0fe31a403bef2694f6392195a12",
-    "hash": "ba026f28fb232cab3a044e0e5f635afd4a98e1e6bbf8334fc76b8cd8414cce9c"
+    "previous_hash": "ddb1a08eddaa7f6e87609b109f3ad92c6fba744d13b5d7332b777ac721b69dff",
+    "hash": "32d5742ed621921055c91edf694a78bc07fbe8dc5e38983156d2ec0dd18d6fd1"
   },
   {
     "index": 6,
-    "timestamp": "2026-04-12T15:08:13.033388",
+    "timestamp": "2026-04-26T10:19:58.287554",
     "type": "VIOLATION",
     "data": {
-      "asset_name": "IPL Trophy 2026",
-      "similarity": 100.0,
-      "risk_level": "CRITICAL",
+      "asset_name": "IPL Winner 2025",
+      "similarity": 71.8,
+      "risk_level": "HIGH",
       "detection_methods": [
         "pHash",
         "dHash",
@@ -131,20 +91,20 @@
         "MobileNet"
       ],
       "found_url": null,
-      "scan_type": "IMAGE",
-      "evidence_hash": "f41aa176fa99c646"
+      "scan_type": "BATCH",
+      "evidence_hash": "3c1bf105a7d1975d"
     },
-    "previous_hash": "ba026f28fb232cab3a044e0e5f635afd4a98e1e6bbf8334fc76b8cd8414cce9c",
-    "hash": "e82a521a350e076dd4599475d7e9aacc09a06909854a963cddf3b410eb46040f"
+    "previous_hash": "32d5742ed621921055c91edf694a78bc07fbe8dc5e38983156d2ec0dd18d6fd1",
+    "hash": "0d5521b2350596beaa607eb5bdd9060604deb9bf49d9e044155c58f56b0eb12d"
   },
   {
     "index": 7,
-    "timestamp": "2026-04-12T15:17:24.342542",
+    "timestamp": "2026-04-26T10:20:14.225965",
     "type": "VIOLATION",
     "data": {
-      "asset_name": "IPL Trophy 2026",
-      "similarity": 100.0,
-      "risk_level": "CRITICAL",
+      "asset_name": "IPL Winner 2025",
+      "similarity": 71.22,
+      "risk_level": "HIGH",
       "detection_methods": [
         "pHash",
         "dHash",
@@ -154,20 +114,20 @@
         "MobileNet"
       ],
       "found_url": null,
-      "scan_type": "IMAGE",
-      "evidence_hash": "f41aa176fa99c646"
+      "scan_type": "BATCH",
+      "evidence_hash": "31c5d8f398322ca0"
     },
-    "previous_hash": "e82a521a350e076dd4599475d7e9aacc09a06909854a963cddf3b410eb46040f",
-    "hash": "bb3657e0de3a020dc04e6c7d236898a1becf1403c3bec8056d623d7877db941f"
+    "previous_hash": "0d5521b2350596beaa607eb5bdd9060604deb9bf49d9e044155c58f56b0eb12d",
+    "hash": "003e8c7492173e586ffc11232c9b0b19a2b1e14b02159d51a08595d2b0f5589c"
   },
   {
     "index": 8,
-    "timestamp": "2026-04-12T15:23:42.248017",
+    "timestamp": "2026-04-26T10:23:29.287293",
     "type": "VIOLATION",
     "data": {
-      "asset_name": "IPL Trophy 2026",
-      "similarity": 100.0,
-      "risk_level": "CRITICAL",
+      "asset_name": "IPL Winner 2025",
+      "similarity": 71.8,
+      "risk_level": "HIGH",
       "detection_methods": [
         "pHash",
         "dHash",
@@ -177,20 +137,20 @@
         "MobileNet"
       ],
       "found_url": null,
-      "scan_type": "IMAGE",
-      "evidence_hash": "f41aa176fa99c646"
+      "scan_type": "BATCH",
+      "evidence_hash": "3c1bf105a7d1975d"
     },
-    "previous_hash": "bb3657e0de3a020dc04e6c7d236898a1becf1403c3bec8056d623d7877db941f",
-    "hash": "afbf47e2c10293b622b40552593167b8c1348dcc882d1a80868f76a9a7f95425"
+    "previous_hash": "003e8c7492173e586ffc11232c9b0b19a2b1e14b02159d51a08595d2b0f5589c",
+    "hash": "ac4a2da18cddfcad3dcc03418b3f2d35ded2c668cc3ef4e41eb0a8feea4a6c56"
   },
   {
     "index": 9,
-    "timestamp": "2026-04-12T15:24:38.299241",
+    "timestamp": "2026-04-26T10:23:48.024326",
     "type": "VIOLATION",
     "data": {
-      "asset_name": "IPL Trophy 2026",
-      "similarity": 100.0,
-      "risk_level": "CRITICAL",
+      "asset_name": "IPL Winner 2025",
+      "similarity": 71.22,
+      "risk_level": "HIGH",
       "detection_methods": [
         "pHash",
         "dHash",
@@ -200,92 +160,10 @@
         "MobileNet"
       ],
       "found_url": null,
-      "scan_type": "IMAGE",
-      "evidence_hash": "f41aa176fa99c646"
+      "scan_type": "BATCH",
+      "evidence_hash": "31c5d8f398322ca0"
     },
-    "previous_hash": "afbf47e2c10293b622b40552593167b8c1348dcc882d1a80868f76a9a7f95425",
-    "hash": "5b540c6fa2591a9cf5a7977699202e837876f3af759a09cc57c0485513a35e8e"
-  },
-  {
-    "index": 10,
-    "timestamp": "2026-04-12T15:28:54.795989",
-    "type": "VIOLATION",
-    "data": {
-      "asset_name": "IPL Trophy 2026",
-      "similarity": 100.0,
-      "risk_level": "CRITICAL",
-      "detection_methods": [
-        "pHash",
-        "dHash",
-        "aHash",
-        "SIFT",
-        "ORB",
-        "MobileNet"
-      ],
-      "found_url": null,
-      "scan_type": "IMAGE",
-      "evidence_hash": "f41aa176fa99c646"
-    },
-    "previous_hash": "5b540c6fa2591a9cf5a7977699202e837876f3af759a09cc57c0485513a35e8e",
-    "hash": "9b4d06ddaa700b99f3098fecca1f690e5d3a76c13c735e0d2718c4c0385bb168"
-  },
-  {
-    "index": 11,
-    "timestamp": "2026-04-12T15:32:12.015634",
-    "type": "VIOLATION",
-    "data": {
-      "asset_name": "IPL Trophy 2026",
-      "similarity": 100.0,
-      "risk_level": "CRITICAL",
-      "detection_methods": [
-        "pHash",
-        "dHash",
-        "aHash",
-        "SIFT",
-        "ORB",
-        "MobileNet"
-      ],
-      "found_url": null,
-      "scan_type": "IMAGE",
-      "evidence_hash": "f41aa176fa99c646"
-    },
-    "previous_hash": "9b4d06ddaa700b99f3098fecca1f690e5d3a76c13c735e0d2718c4c0385bb168",
-    "hash": "62cffb50432d95f5ae34cd6dcb8398a16f77a0e80671a1b8ad672467f56e1486"
-  },
-  {
-    "index": 12,
-    "timestamp": "2026-04-12T15:34:13.418702",
-    "type": "VIOLATION",
-    "data": {
-      "asset_name": "IPL Trophy 2026",
-      "similarity": 100.0,
-      "risk_level": "CRITICAL",
-      "detection_methods": [
-        "pHash",
-        "dHash",
-        "aHash",
-        "SIFT",
-        "ORB",
-        "MobileNet"
-      ],
-      "found_url": null,
-      "scan_type": "IMAGE",
-      "evidence_hash": "f41aa176fa99c646"
-    },
-    "previous_hash": "62cffb50432d95f5ae34cd6dcb8398a16f77a0e80671a1b8ad672467f56e1486",
-    "hash": "4da3712b20589c7306db545fb57c9fde9cca58d71dcbc4f5885193f0b02570ff"
-  },
-  {
-    "index": 13,
-    "timestamp": "2026-04-14T14:34:34.979272",
-    "type": "ASSET_REGISTERED",
-    "data": {
-      "asset_name": "Virat Kohli Highlights",
-      "filename": "reg_video_9af359a42ca043d9983ece192ae53a1b.mp4",
-      "fingerprint": "VIDEO:5_frames...",
-      "registered_by": "VERIAX"
-    },
-    "previous_hash": "4da3712b20589c7306db545fb57c9fde9cca58d71dcbc4f5885193f0b02570ff",
-    "hash": "3e17417b8add9fc5c1107b12f5aa9c047e7d862fb8de8866fc2a006e4d697214"
+    "previous_hash": "ac4a2da18cddfcad3dcc03418b3f2d35ded2c668cc3ef4e41eb0a8feea4a6c56",
+    "hash": "354adde9a791170857676a6403e1b911ee0ec3ca3f02b27d89699e98e43668a2"
   }
 ]

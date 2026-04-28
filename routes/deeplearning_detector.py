@@ -5,10 +5,26 @@ from PIL import Image
 import numpy as np
 import os
 
-# Load MobileNet model once at startup
-print("Loading MobileNet model...")
-model = models.mobilenet_v3_small(weights=models.MobileNet_V3_Small_Weights.DEFAULT)
-model.eval()  # Set to evaluation mode
+# ── Lazy model loading ───────────────────────────────────────────────────────
+# DO NOT load the model at import time — it consumes ~400MB RAM and crashes
+# free-tier servers (Render 512MB, Cloud Run 256MB default) before any request
+# is served. The model is loaded once on first use instead.
+
+_model = None
+
+
+def get_model():
+    """Load MobileNet model on first call only (lazy init)."""
+    global _model
+    if _model is None:
+        print("Loading MobileNet model (lazy)...")
+        _model = models.mobilenet_v3_small(
+            weights=models.MobileNet_V3_Small_Weights.DEFAULT
+        )
+        _model.eval()
+        print("MobileNet model loaded successfully!")
+    return _model
+
 
 # Image preprocessing pipeline
 transform = transforms.Compose([
@@ -20,12 +36,14 @@ transform = transforms.Compose([
     )
 ])
 
+
 def get_embedding(image_path):
     """
-    Convert image to deep learning embedding vector
-    This vector represents the IMAGE CONTENT not just pixels
+    Convert image to deep learning embedding vector.
+    This vector represents the IMAGE CONTENT not just pixels.
     """
     try:
+        model = get_model()
         img = Image.open(image_path).convert('RGB')
         tensor = transform(img).unsqueeze(0)
 
@@ -41,10 +59,11 @@ def get_embedding(image_path):
         print(f"Embedding error: {e}")
         return None
 
+
 def cosine_similarity(vec1, vec2):
     """
-    Compare two embedding vectors using cosine similarity
-    Returns 0-100 score
+    Compare two embedding vectors using cosine similarity.
+    Returns 0-100 score.
     """
     try:
         dot = np.dot(vec1, vec2)
@@ -62,10 +81,11 @@ def cosine_similarity(vec1, vec2):
         print(f"Cosine similarity error: {e}")
         return 0
 
+
 def mobilenet_similarity(img1_path, img2_path):
     """
-    Compare two images using MobileNet deep learning embeddings
-    Returns similarity score 0-100
+    Compare two images using MobileNet deep learning embeddings.
+    Returns similarity score 0-100.
     """
     try:
         emb1 = get_embedding(img1_path)
@@ -81,10 +101,11 @@ def mobilenet_similarity(img1_path, img2_path):
         print(f"MobileNet error: {e}")
         return 0
 
+
 def save_embedding(image_path, save_dir='database/embeddings'):
     """
-    Pre-compute and save embedding for a registered asset
-    Makes future comparisons faster
+    Pre-compute and save embedding for a registered asset.
+    Makes future comparisons faster.
     """
     try:
         os.makedirs(save_dir, exist_ok=True)
@@ -100,8 +121,9 @@ def save_embedding(image_path, save_dir='database/embeddings'):
         print(f"Save embedding error: {e}")
         return None
 
+
 def load_embedding(image_path, save_dir='database/embeddings'):
-    """Load pre-computed embedding if available"""
+    """Load pre-computed embedding if available."""
     try:
         filename = os.path.basename(image_path)
         save_path = os.path.join(save_dir, filename + '.npy')
@@ -112,9 +134,10 @@ def load_embedding(image_path, save_dir='database/embeddings'):
     except:
         return None
 
+
 def fast_mobilenet_similarity(img1_path, img2_path):
     """
-    Fast version — uses cached embeddings when available
+    Fast version — uses cached embeddings when available.
     """
     try:
         # Try to load cached embedding for asset
@@ -134,5 +157,3 @@ def fast_mobilenet_similarity(img1_path, img2_path):
     except Exception as e:
         print(f"Fast MobileNet error: {e}")
         return 0
-
-print("MobileNet model loaded successfully!")

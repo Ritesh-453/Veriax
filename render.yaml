@@ -2,8 +2,13 @@ services:
   - type: web
     name: veriax-sportshield
     runtime: python
+    # Use 'standard' plan (1GB RAM) — free tier (512MB) crashes when
+    # PyTorch/MobileNet loads on first scan request (~400MB usage).
+    plan: starter
     buildCommand: pip install --upgrade pip && pip install -r requirements.txt
-    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --timeout 120
+    # 1 worker, 2 threads — keeps memory predictable on small instances.
+    # Increase workers only if you upgrade to a plan with >2GB RAM.
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --timeout 180 --workers 1 --threads 2
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
