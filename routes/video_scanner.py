@@ -224,34 +224,21 @@ CONFIDENCE: 0-100
 INDICATORS: comma-separated list of what you found (e.g. scoreboard,stadium crowd,broadcast logo) or NONE
 VERDICT: one sentence summary"""
 
-        response = req.post(
-            'https://api.groq.com/openai/v1/chat/completions',
-            headers={
-                'Authorization': f'Bearer {os.getenv("GROQ_API_KEY")}',
-                'Content-Type': 'application/json'
-            },
-            json={
-                'model': 'meta-llama/llama-4-scout-17b-16e-instruct',
-                'messages': [{
-                    'role': 'user',
-                    'content': [
-                        {
-                            'type': 'image_url',
-                            'image_url': {'url': f'data:image/jpeg;base64,{img_b64}'}
-                        },
-                        {'type': 'text', 'text': prompt}
-                    ]
-                }],
-                'max_tokens': 200
-            },
-            timeout=30
-        )
-        response.raise_for_status()
-        text = response.json()['choices'][0]['message']['content']
+        import google.generativeai as genai
+        api_key = os.getenv('GEMINI_API_KEY')
+        if not api_key:
+            raise ValueError('GEMINI_API_KEY not set in .env')
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        response = model.generate_content([
+            {'mime_type': 'image/jpeg', 'data': img_b64},
+            prompt
+        ])
+        text = response.text
         return _parse_gemini_verdict(text)
 
     except Exception as e:
-        print(f"[Groq] Frame analysis error: {e}")
+        print(f"[Gemini] Frame analysis error: {e}")
         return {
             'is_match_content': False,
             'confidence': 0,
